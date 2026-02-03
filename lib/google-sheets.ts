@@ -78,17 +78,25 @@ export const readLeadsFromSheet = async (
   const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
   const nameColIndex = findColumnIndex(['name']) ?? 5; // Declare nameColIndex here
 
-  console.log('[v0] Column mapping:', {
-    firstName: firstNameColIndex,
-    lastName: lastNameColIndex,
-    email: emailColIndex,
-    phones: phoneIndices,
-    status: statusColIndex,
-    notes: notesColIndex,
-    attempts: attemptsColIndex,
-    lastAttempt: lastAttemptColIndex,
-    name: nameColIndex, // Include nameColIndex in the log
+  console.log('[v0] ===== COLUMN ALIGNMENT VERIFICATION =====');
+  console.log('[v0] Expected columns: G=First Name, H=Last Name, E=Email, J-N=Phones, P=Status, Q=Notes, R=Attempts, S=Last Attempt');
+  console.log('[v0] Detected indices:', {
+    'First Name (should be 6)': firstNameColIndex,
+    'Last Name (should be 7)': lastNameColIndex,
+    'Email (should be 4)': emailColIndex,
+    'Phone columns (should be 9,10,11,12,13)': phoneIndices,
+    'Status (should be 15)': statusColIndex,
+    'Notes (should be 16)': notesColIndex,
+    'Attempts (should be 17)': attemptsColIndex,
+    'Last Attempt (should be 18)': lastAttemptColIndex,
   });
+  console.log('[v0] Column letters:', {
+    Status: String.fromCharCode(65 + statusColIndex),
+    Notes: String.fromCharCode(65 + notesColIndex),
+    Attempts: String.fromCharCode(65 + attemptsColIndex),
+    'Last Attempt': String.fromCharCode(65 + lastAttemptColIndex),
+  });
+  console.log('[v0] ==========================================');
 
   // Data rows start from index 1 (skip header at index 0)
   const dataRows = allRows.slice(1);
@@ -138,7 +146,16 @@ export const readLeadsFromSheet = async (
 
   console.log('[v0] Final leads count:', leads.length);
   if (leads.length > 0) {
-    console.log('[v0] First lead:', leads[0]);
+    console.log('[v0] First lead sample:', {
+      name: leads[0].name,
+      phone: leads[0].phone,
+      email: leads[0].email,
+      status: leads[0].status,
+      notes: leads[0].notes,
+      attempts: leads[0].attempts,
+      rowIndex: leads[0].rowIndex,
+    });
+    console.log('[v0] ===== VERIFY: Check if Status/Notes/Attempts will write to P/Q/R columns in your sheet =====');
   }
   
   return leads;
@@ -203,13 +220,16 @@ export const updateLeadStatus = async (
   const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
   const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
 
-  console.log('[v0] Update column mapping:', {
-    statusCol: indexToLetter(statusColIndex),
-    notesCol: indexToLetter(notesColIndex),
-    attemptsCol: indexToLetter(attemptsColIndex),
-    lastAttemptCol: indexToLetter(lastAttemptColIndex),
-    rowIndex: rowIndex,
+  console.log('[v0] ===== UPDATE VERIFICATION =====');
+  console.log('[v0] Expected: Status=P(15), Notes=Q(16), Attempts=R(17), Last Attempt=S(18)');
+  console.log('[v0] Detected:', {
+    'Status (should be P/15)': `${indexToLetter(statusColIndex)}(${statusColIndex})`,
+    'Notes (should be Q/16)': `${indexToLetter(notesColIndex)}(${notesColIndex})`,
+    'Attempts (should be R/17)': `${indexToLetter(attemptsColIndex)}(${attemptsColIndex})`,
+    'Last Attempt (should be S/18)': `${indexToLetter(lastAttemptColIndex)}(${lastAttemptColIndex})`,
+    'Row': rowIndex,
   });
+  console.log('[v0] ===================================');
 
   const updateData = [];
 
