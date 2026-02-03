@@ -17,7 +17,7 @@ const sheets = google.sheets('v4');
 export const readLeadsFromSheet = async (
   accessToken: string,
   spreadsheetId: string,
-  sheetName: string = 'Leads'
+  sheetName: string = 'Lead mine 2026'
 ): Promise<Lead[]> => {
   const auth = new google.auth.OAuth2(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -75,7 +75,7 @@ export const updateLeadStatus = async (
     attempts?: number;
     lastAttempt?: string;
   },
-  sheetName: string = 'Leads'
+  sheetName: string = 'Lead mine 2026'
 ) => {
   const auth = new google.auth.OAuth2(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,

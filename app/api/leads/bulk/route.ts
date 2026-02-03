@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const response = await sheets.spreadsheets.values.get({
       auth,
       spreadsheetId,
-      range: 'Leads!A2:S1000',
+      range: 'Lead mine 2026!A2:S1000',
     });
 
     const rows = response.data.values || [];
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         rows.forEach((row, index) => {
           if (row[16] === 'no-answer') {
             updates.push({
-              range: `Leads!P${index + 2}`,
+              range: `'Lead mine 2026'!P${index + 2}`,
               values: [['pending']],
             });
           }
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         rows.forEach((row, index) => {
           if (row[16] === 'no-answer') {
             updates.push({
-              range: `Leads!Q${index + 2}`,
+              range: `'Lead mine 2026'!Q${index + 2}`,
               values: [[`${row[17] || ''}\n[FLAGGED FOR RETRY]`]],
             });
           }
@@ -68,11 +68,11 @@ export async function POST(request: NextRequest) {
         rows.forEach((row, index) => {
           if (row[16] === 'pending') {
             updates.push({
-              range: `Leads!P${index + 2}`,
+              range: `'Lead mine 2026'!P${index + 2}`,
               values: [['no-answer']],
             });
             updates.push({
-              range: `Leads!R${index + 2}`,
+              range: `'Lead mine 2026'!R${index + 2}`,
               values: [[parseInt(row[18] || '0', 10) + 1]],
             });
           }
@@ -84,11 +84,11 @@ export async function POST(request: NextRequest) {
         // Reset all to pending
         rows.forEach((row, index) => {
           updates.push({
-            range: `Leads!P${index + 2}`,
+            range: `'Lead mine 2026'!P${index + 2}`,
             values: [['pending']],
           });
           updates.push({
-            range: `Leads!Q${index + 2}`,
+            range: `'Lead mine 2026'!Q${index + 2}`,
             values: [['']],
           });
         });
