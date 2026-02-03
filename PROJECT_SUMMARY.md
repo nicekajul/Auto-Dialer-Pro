@@ -77,7 +77,7 @@ A complete, production-ready web-based auto-dialer application for sales teams t
 
 ## File Structure
 
-```
+\`\`\`
 /
 ├── app/
 │   ├── page.tsx                          # Login page
@@ -123,7 +123,7 @@ A complete, production-ready web-based auto-dialer application for sales teams t
 ├── PROJECT_SUMMARY.md                    # This file
 ├── .env.local.example                    # Environment template
 └── package.json                          # Dependencies
-```
+\`\`\`
 
 ## Technology Stack
 
@@ -167,7 +167,7 @@ A complete, production-ready web-based auto-dialer application for sales teams t
 ## Database Design
 
 ### Google Sheet Structure
-```
+\`\`\`
 Column A: Name (required)
 Column B: Phone (required)
 Column C: Email (optional)
@@ -175,16 +175,16 @@ Column D: Status (pending/answered/no-answer/voicemail/busy)
 Column E: Notes (free-form text)
 Column F: Attempts (auto-incremented)
 Column G: Last Attempt (ISO timestamp)
-```
+\`\`\`
 
 ## Environment Configuration
 
 Required variables:
-```
+\`\`\`
 NEXT_PUBLIC_GOOGLE_CLIENT_ID
 GOOGLE_CLIENT_SECRET
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-```
+\`\`\`
 
 All stored securely via Vercel's environment variables system.
 

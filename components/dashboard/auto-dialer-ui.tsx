@@ -50,45 +50,56 @@ export function AutoDialerUI({
   };
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-      <CardHeader>
+    <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
+      <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl">Active Dialer</CardTitle>
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+            Active Dialer
+          </CardTitle>
           {isAutoDialing && (
-            <Badge className="bg-green-600 text-white animate-pulse">Live Call</Badge>
+            <Badge className="gradient-accent shadow-glow-green text-white animate-pulse px-3 py-1">
+              Live Call
+            </Badge>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         {currentLead ? (
           <>
             {/* Current Lead Info */}
-            <div className="space-y-4 p-4 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-white" />
+            <div className="space-y-4 p-5 glass rounded-xl border-l-4 border-primary/50">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 gradient-primary rounded-full flex items-center justify-center shadow-glow ring-2 ring-primary/20">
+                  <User className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-lg">{currentLead.name}</h3>
-                  <p className="text-sm text-slate-400">{currentLead.email}</p>
+                  <h3 className="font-bold text-white text-xl">{currentLead.name}</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5" />
+                    {currentLead.email}
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2 p-3 bg-slate-800 rounded relative group cursor-pointer">
-                  <Phone className="w-5 h-5 text-blue-400" />
-                  <div className="flex-1">
-                    <p className="text-xs text-slate-400">Phone</p>
-                    <p className="font-mono text-white font-semibold">{formatPhoneNumber(currentLead.phone)}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-3 p-4 glass-strong rounded-lg relative group cursor-pointer hover:border-primary/50 transition-all">
+                  <div className="w-10 h-10 rounded-lg gradient-primary/20 flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-primary" />
                   </div>
-                  <ExternalLink className="w-3 h-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground font-medium">Phone</p>
+                    <p className="font-mono text-white font-bold text-sm">{formatPhoneNumber(currentLead.phone)}</p>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <div className="flex items-center gap-2 p-3 bg-slate-800 rounded">
-                  <Clock className="w-5 h-5 text-amber-400" />
+                <div className="flex items-center gap-3 p-4 glass-strong rounded-lg">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-amber-400" />
+                  </div>
                   <div>
-                    <p className="text-xs text-slate-400">Duration</p>
-                    <p className="font-mono text-white font-semibold">{formatDuration(callDuration)}</p>
+                    <p className="text-xs text-muted-foreground font-medium">Duration</p>
+                    <p className="font-mono text-white font-bold text-sm">{formatDuration(callDuration)}</p>
                   </div>
                 </div>
               </div>
@@ -99,7 +110,7 @@ export function AutoDialerUI({
               <Button
                 onClick={() => openClickToDial(currentLead.phone, currentLead.name)}
                 size="lg"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 font-semibold"
+                className="w-full gradient-primary hover:opacity-90 text-white h-14 font-bold text-base shadow-glow transition-all"
               >
                 <Phone className="w-5 h-5 mr-2" />
                 Click-to-Dial
@@ -108,7 +119,7 @@ export function AutoDialerUI({
                 <Button
                   onClick={onStopDialing}
                   size="lg"
-                  className="w-full bg-red-600 hover:bg-red-700 text-white h-12 font-semibold"
+                  className="w-full bg-destructive hover:bg-destructive/90 text-white h-14 font-bold text-base shadow-lg"
                 >
                   <PhoneOff className="w-5 h-5 mr-2" />
                   End Call
@@ -118,7 +129,7 @@ export function AutoDialerUI({
                   onClick={onStartDialing}
                   size="lg"
                   variant="outline"
-                  className="w-full border-slate-600 text-slate-300 h-12 font-semibold bg-transparent"
+                  className="w-full border-primary/30 text-foreground h-14 font-bold text-base hover:bg-primary/10 hover:border-primary/50 bg-transparent transition-all"
                 >
                   <Phone className="w-5 h-5 mr-2" />
                   Auto-Dial Next

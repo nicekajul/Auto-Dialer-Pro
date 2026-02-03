@@ -65,9 +65,9 @@ The app will automatically populate the Status column (P) with these values:
 
 ## Example Row
 
-```
+\`\`\`
 01/27/2026 | Amanda Wilson | iUniverse | [owner] | andrewgka@gmail.com | Andrew G. Kadar | Andrew G. | Kadar | The No-Bull Guide | (310) 772-0011 | (310) 880-1989 | ... | [blank] | pending | [blank] | 0 | [blank]
-```
+\`\`\`
 
 ## Setup Checklist
 

@@ -155,10 +155,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950">
+    <main className="min-h-screen bg-background">
       <DashboardHeader agentName={state.agentName} />
 
-      <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="container mx-auto px-6 py-8 space-y-6 pb-24">
         {/* Main Content */}
         {activeTab === 'dialer' && (
           <div className="grid lg:grid-cols-3 gap-6">
@@ -190,23 +190,27 @@ export default function DashboardPage() {
         )}
 
         {/* Tab Navigation */}
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 bg-slate-800 border border-slate-700 rounded-full p-1">
-          {(['dialer', 'queue', 'analytics', 'actions'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-full font-medium transition-colors text-sm ${
-                activeTab === tab
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              {tab === 'dialer' && 'Dialer'}
-              {tab === 'queue' && 'Queue'}
-              {tab === 'analytics' && 'Analytics'}
-              {tab === 'actions' && 'Actions'}
-            </button>
-          ))}
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-40">
+          <div className="glass-strong border-border/50 rounded-2xl p-1.5 shadow-glow">
+            <div className="flex gap-1">
+              {(['dialer', 'queue', 'analytics', 'actions'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all text-sm ${
+                    activeTab === tab
+                      ? 'gradient-primary text-white shadow-glow'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-primary/5'
+                  }`}
+                >
+                  {tab === 'dialer' && 'Dialer'}
+                  {tab === 'queue' && 'Queue'}
+                  {tab === 'analytics' && 'Analytics'}
+                  {tab === 'actions' && 'Actions'}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </main>

@@ -56,29 +56,29 @@ A powerful web-based auto-dialer application for sales teams. Automate lead call
 ### Setup (5 minutes)
 
 1. **Get Started**
-   ```bash
+   \`\`\`bash
    npm install
-   ```
+   \`\`\`
 
 2. **Configure Google OAuth**
    - See `SETUP_GUIDE.md` for detailed instructions
 
 3. **Add Environment Variables**
-   ```
+   \`\`\`
    NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_client_id
    GOOGLE_CLIENT_SECRET=your_client_secret
    NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
-   ```
+   \`\`\`
 
 4. **Run Locally**
-   ```bash
+   \`\`\`bash
    npm run dev
-   ```
+   \`\`\`
 
 5. **Deploy to Vercel**
-   ```bash
+   \`\`\`bash
    vercel deploy
-   ```
+   \`\`\`
 
 ## 📖 Documentation
 
@@ -100,11 +100,11 @@ Create a sheet with these columns:
 | G | Last Attempt | DateTime | No |
 
 ### Example Data
-```
+\`\`\`
 Name          | Phone          | Email                | Status     | Notes | Attempts | Last Attempt
 John Smith    | +1-555-123-4567| john@example.com     | pending    |       | 0        |
 Jane Doe      | +1-555-987-6543| jane@example.com     | answered   | Demo call | 1 | 2026-02-04T14:30:00Z
-```
+\`\`\`
 
 ## 🏗️ Architecture
 
@@ -117,7 +117,7 @@ Jane Doe      | +1-555-987-6543| jane@example.com     | answered   | Demo call |
 - **Authentication**: Google OAuth 2.0
 
 ### Data Flow
-```
+\`\`\`
 Browser (UI)
     ↓
 Next.js API Routes
@@ -127,11 +127,11 @@ Google OAuth (Authentication)
 Google Sheets API
     ↓
 Your Google Sheet
-```
+\`\`\`
 
 ### Key Components
 
-```
+\`\`\`
 /app
   ├── page.tsx              # Login page
   ├── dashboard/
@@ -160,7 +160,7 @@ Your Google Sheet
   ├── google-sheets.ts      # Sheets API wrapper
   ├── ringcentral-dial.ts   # Click-to-dial URLs
   └── call-manager.ts       # Call state management
-```
+\`\`\`
 
 ## 🔐 Security
 
@@ -240,12 +240,12 @@ Track your team's performance:
 
 ### Environment Variables
 
-```bash
+\`\`\`bash
 # Required for Google OAuth
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-client-id>.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=<your-client-secret>
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
-```
+\`\`\`
 
 ### Optional Customizations
 

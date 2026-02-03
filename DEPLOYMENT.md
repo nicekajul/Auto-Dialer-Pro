@@ -28,7 +28,7 @@
 
 ### Step 1: Push to GitHub
 
-```bash
+\`\`\`bash
 # Initialize git (if not already done)
 git init
 
@@ -45,7 +45,7 @@ git commit -m "Initial commit: Auto-Dialer Pro"
 git remote add origin https://github.com/YOUR_USERNAME/auto-dialer-pro.git
 git branch -M main
 git push -u origin main
-```
+\`\`\`
 
 ### Step 2: Deploy to Vercel
 
@@ -65,11 +65,11 @@ In Vercel dashboard:
 1. Go to your project **"Settings" → "Environment Variables"**
 2. Add three variables:
 
-```
+\`\`\`
 NEXT_PUBLIC_GOOGLE_CLIENT_ID = your_client_id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET = your_client_secret (KEEP PRIVATE!)
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI = https://auto-dialer-pro.vercel.app/api/auth/google-callback
-```
+\`\`\`
 
 **Important**: Replace `auto-dialer-pro` with your actual Vercel project name
 
@@ -86,14 +86,14 @@ In [Google Cloud Console](https://console.cloud.google.com):
 
 ### Step 5: Trigger Deployment
 
-```bash
+\`\`\`bash
 # Option A: Push new commit
 git commit --allow-empty -m "Trigger deployment"
 git push
 
 # Option B: Manual redeploy from Vercel dashboard
 # Click "Deploy" button
-```
+\`\`\`
 
 **Done!** Your app is live at `https://auto-dialer-pro.vercel.app`
 
@@ -126,11 +126,11 @@ git push
 
 In the "Environment" section:
 
-```
+\`\`\`
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your_client_secret
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=https://auto-dialer-pro.ondigitalocean.app/api/auth/google-callback
-```
+\`\`\`
 
 ### Step 4: Choose Plan
 
@@ -147,9 +147,9 @@ NEXT_PUBLIC_GOOGLE_REDIRECT_URI=https://auto-dialer-pro.ondigitalocean.app/api/a
 ### Step 6: Update Google OAuth
 
 In Google Console, add your new domain to redirect URIs:
-```
+\`\`\`
 https://your-app.ondigitalocean.app/api/auth/google-callback
-```
+\`\`\`
 
 ---
 
@@ -197,7 +197,7 @@ Add the Railway URL to Google Console redirect URIs.
 
 ### Step 1: Create Dockerfile
 
-```dockerfile
+\`\`\`dockerfile
 # Dockerfile
 FROM node:18-alpine
 
@@ -220,22 +220,22 @@ EXPOSE 3000
 
 # Start app
 CMD ["npm", "start"]
-```
+\`\`\`
 
 ### Step 2: Create .dockerignore
 
-```
+\`\`\`
 .git
 .next
 node_modules
 .env.local
 .env
 npm-debug.log
-```
+\`\`\`
 
 ### Step 3: Build Docker Image
 
-```bash
+\`\`\`bash
 # Build
 docker build -t auto-dialer-pro:latest .
 
@@ -245,17 +245,17 @@ docker run -p 3000:3000 \
   -e GOOGLE_CLIENT_SECRET=your_secret \
   -e NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback \
   auto-dialer-pro:latest
-```
+\`\`\`
 
 ### Step 4: Push to Docker Hub
 
-```bash
+\`\`\`bash
 # Tag
 docker tag auto-dialer-pro:latest username/auto-dialer-pro:latest
 
 # Push
 docker push username/auto-dialer-pro:latest
-```
+\`\`\`
 
 ### Step 5: Deploy to Production
 
@@ -266,13 +266,13 @@ Deploy the Docker image to:
 - **Your own server with Docker**
 
 Example with Google Cloud Run:
-```bash
+\`\`\`bash
 gcloud run deploy auto-dialer-pro \
   --image gcr.io/your-project/auto-dialer-pro:latest \
   --set-env-vars NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_id \
   --set-env-vars GOOGLE_CLIENT_SECRET=your_secret \
   --port 3000
-```
+\`\`\`
 
 ---
 
@@ -340,18 +340,18 @@ gcloud run deploy auto-dialer-pro \
 
 All platforms support automatic deployment on push:
 
-```bash
+\`\`\`bash
 # Make changes
 git add .
 git commit -m "Feature: Add new capability"
 git push origin main
 
 # Deployment starts automatically!
-```
+\`\`\`
 
 ### Manual Rollback
 
-```bash
+\`\`\`bash
 # Revert to previous commit
 git revert HEAD
 git push
@@ -359,7 +359,7 @@ git push
 # Or reset to specific commit
 git reset --hard abc123
 git push --force-with-lease
-```
+\`\`\`
 
 ---
 
@@ -438,29 +438,29 @@ git push --force-with-lease
 ## 🎯 Deployment Quick Reference
 
 ### Vercel (Fastest)
-```bash
+\`\`\`bash
 # Push to GitHub → Auto-deploys
 # Add env vars in Vercel dashboard
 # Update Google OAuth → Done!
-```
+\`\`\`
 
 ### DigitalOcean
-```bash
+\`\`\`bash
 # Create App → Select GitHub → Configure → Deploy
 # Takes ~5 minutes
-```
+\`\`\`
 
 ### Railway
-```bash
+\`\`\`bash
 # Connect GitHub → Set env vars → Deploy
 # Takes ~3 minutes
-```
+\`\`\`
 
 ### Docker
-```bash
+\`\`\`bash
 # docker build → docker push → Deploy image
 # Platform-dependent timing
-```
+\`\`\`
 
 ---
 

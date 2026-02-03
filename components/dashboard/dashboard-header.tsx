@@ -16,11 +16,15 @@ export function DashboardHeader({ agentName }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="border-b border-slate-700 bg-slate-800/50 backdrop-blur-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="border-b border-border/30 glass-strong sticky top-0 z-50">
+      <div className="container mx-auto px-6 py-5 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Auto-Dialer Pro</h1>
-          {agentName && <p className="text-sm text-slate-400">Agent: {agentName}</p>}
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Auto-Dialer Pro
+          </h1>
+          {agentName && (
+            <p className="text-sm text-muted-foreground mt-0.5">Agent: {agentName}</p>
+          )}
         </div>
         <Button
           onClick={handleLogout}
