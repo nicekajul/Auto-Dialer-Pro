@@ -57,38 +57,38 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid md:grid-cols-5 gap-4">
-        <Card className="glass-strong border-border shadow-lg">
+        <Card className="border-2 border-border shadow-lg bg-card">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-foreground/70 mb-2 uppercase tracking-wide">Total Leads</p>
+            <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">Total Leads</p>
             <p className="text-4xl font-bold text-foreground">{stats.total}</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-strong border-border shadow-lg bg-emerald-500/10">
+        <Card className="border-2 border-emerald-500/30 shadow-lg bg-emerald-50 dark:bg-emerald-950">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-emerald-300 mb-2 uppercase tracking-wide">Contacted</p>
-            <p className="text-4xl font-bold text-emerald-400">{stats.answered}</p>
+            <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-2 uppercase tracking-wider">Contacted</p>
+            <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400">{stats.answered}</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-strong border-border shadow-lg bg-red-500/10">
+        <Card className="border-2 border-red-500/30 shadow-lg bg-red-50 dark:bg-red-950">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-red-300 mb-2 uppercase tracking-wide">No Answer</p>
-            <p className="text-4xl font-bold text-red-400">{stats.noAnswer}</p>
+            <p className="text-xs font-bold text-red-700 dark:text-red-300 mb-2 uppercase tracking-wider">No Answer</p>
+            <p className="text-4xl font-bold text-red-600 dark:text-red-400">{stats.noAnswer}</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-strong border-border shadow-lg bg-blue-500/10">
+        <Card className="border-2 border-blue-500/30 shadow-lg bg-blue-50 dark:bg-blue-950">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-blue-300 mb-2 uppercase tracking-wide">Contact Rate</p>
-            <p className="text-4xl font-bold text-blue-400">{contactRate}%</p>
+            <p className="text-xs font-bold text-blue-700 dark:text-blue-300 mb-2 uppercase tracking-wider">Contact Rate</p>
+            <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{contactRate}%</p>
           </CardContent>
         </Card>
 
-        <Card className="glass-strong border-border shadow-lg bg-amber-500/10">
+        <Card className="border-2 border-amber-500/30 shadow-lg bg-amber-50 dark:bg-amber-950">
           <CardContent className="pt-6">
-            <p className="text-sm font-semibold text-amber-300 mb-2 uppercase tracking-wide">Pending</p>
-            <p className="text-4xl font-bold text-amber-400">{stats.pending}</p>
+            <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-2 uppercase tracking-wider">Pending</p>
+            <p className="text-4xl font-bold text-amber-600 dark:text-amber-400">{stats.pending}</p>
           </CardContent>
         </Card>
       </div>
@@ -96,37 +96,75 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
       {/* Charts */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Call Outcome Distribution */}
-        <Card className="glass-strong border-border shadow-lg">
-          <CardHeader className="border-b border-border/50">
+        <Card className="border-2 border-border shadow-lg bg-card">
+          <CardHeader className="border-b-2 border-border">
             <CardTitle className="text-xl font-bold text-foreground">Call Outcome Distribution</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value">
+                <Pie 
+                  data={pieData} 
+                  cx="50%" 
+                  cy="50%" 
+                  innerRadius={60} 
+                  outerRadius={100} 
+                  dataKey="value"
+                  label={(entry) => entry.name}
+                  labelLine={false}
+                >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#fff' }} />
-                <Legend wrapperStyle={{ color: '#fff' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white', 
+                    border: '2px solid #e5e7eb', 
+                    borderRadius: '8px', 
+                    color: '#111827',
+                    fontWeight: 600
+                  }} 
+                />
+                <Legend 
+                  wrapperStyle={{ 
+                    color: '#111827',
+                    fontWeight: 600,
+                    fontSize: '14px'
+                  }} 
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         {/* Attempts Distribution */}
-        <Card className="glass-strong border-border shadow-lg">
-          <CardHeader className="border-b border-border/50">
+        <Card className="border-2 border-border shadow-lg bg-card">
+          <CardHeader className="border-b-2 border-border">
             <CardTitle className="text-xl font-bold text-foreground">Call Attempts</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={attemptsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="name" stroke="#d1d5db" />
-                <YAxis stroke="#d1d5db" />
-                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: '8px', color: '#fff' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#374151"
+                  style={{ fontSize: '14px', fontWeight: 600 }}
+                />
+                <YAxis 
+                  stroke="#374151"
+                  style={{ fontSize: '14px', fontWeight: 600 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'white', 
+                    border: '2px solid #e5e7eb', 
+                    borderRadius: '8px', 
+                    color: '#111827',
+                    fontWeight: 600
+                  }} 
+                />
                 <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
