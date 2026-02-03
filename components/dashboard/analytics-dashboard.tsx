@@ -23,14 +23,17 @@ const COLORS = {
 };
 
 export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
+  // Safety check: ensure leads is an array
+  const leadsArray = Array.isArray(leads) ? leads : [];
+
   // Calculate stats
   const stats = {
-    total: leads.length,
-    answered: leads.filter((l) => l.status === 'answered').length,
-    noAnswer: leads.filter((l) => l.status === 'no-answer').length,
-    voicemail: leads.filter((l) => l.status === 'voicemail').length,
-    busy: leads.filter((l) => l.status === 'busy').length,
-    pending: leads.filter((l) => l.status === 'pending').length,
+    total: leadsArray.length,
+    answered: leadsArray.filter((l) => l.status === 'answered').length,
+    noAnswer: leadsArray.filter((l) => l.status === 'no-answer').length,
+    voicemail: leadsArray.filter((l) => l.status === 'voicemail').length,
+    busy: leadsArray.filter((l) => l.status === 'busy').length,
+    pending: leadsArray.filter((l) => l.status === 'pending').length,
   };
 
   const contactRate =
@@ -45,9 +48,9 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
   ].filter((item) => item.value > 0);
 
   const attemptsData = [
-    { name: '1 Attempt', count: leads.filter((l) => l.attempts === 1).length },
-    { name: '2 Attempts', count: leads.filter((l) => l.attempts === 2).length },
-    { name: '3+ Attempts', count: leads.filter((l) => l.attempts >= 3).length },
+    { name: '1 Attempt', count: leadsArray.filter((l) => l.attempts === 1).length },
+    { name: '2 Attempts', count: leadsArray.filter((l) => l.attempts === 2).length },
+    { name: '3+ Attempts', count: leadsArray.filter((l) => l.attempts >= 3).length },
   ];
 
   return (

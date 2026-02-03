@@ -35,6 +35,11 @@ export const readLeadsFromSheet = async (
   });
 
   const rows = response.data.values || [];
+  console.log('[v0] Total rows fetched:', rows.length);
+  if (rows.length > 0) {
+    console.log('[v0] First row sample (all columns):', rows[0]);
+  }
+  
   const leads: Lead[] = rows
     .map((row, index) => {
       // Extract primary phone (first available from PHONE 1-5)
@@ -47,10 +52,17 @@ export const readLeadsFromSheet = async (
       ].filter((p) => p && p.trim().length > 0);
 
       const primaryPhone = phones[0] || '';
+      const leadName = row[5] || '';
+      
+      // Debug: Log Amanda Wilson's phone and all row data
+      if (leadName.includes('Amanda')) {
+        console.log('[v0] Amanda Wilson full row:', row);
+        console.log('[v0] Amanda Wilson - Index:', index, 'Name (col F/5):', row[5], 'Phones (cols J-N/9-13):', phones, 'Selected:', primaryPhone);
+      }
 
       return {
         id: `lead-${index}`,
-        name: row[5] || '', // Name (column F)
+        name: leadName, // Name (column F)
         phone: primaryPhone,
         email: row[4] || '', // Email Address (column E)
         status: (row[16] || 'pending') as Lead['status'], // Status (column P)
@@ -62,6 +74,7 @@ export const readLeadsFromSheet = async (
     })
     .filter((lead) => lead.phone.trim().length > 0);
 
+  console.log('[v0] Filtered leads count:', leads.length);
   return leads;
 };
 

@@ -56,10 +56,21 @@ export default function DashboardPage() {
       const response = await fetch(
         `/api/leads?spreadsheetId=${encodeURIComponent(state.spreadsheetId)}`
       );
-      const leads = await response.json();
-      setState((prev) => ({ ...prev, leads }));
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // Ensure data is an array
+      const leadsArray = Array.isArray(data) ? data : [];
+      console.log('[v0] Fetched leads:', leadsArray.length, 'leads');
+      if (leadsArray.length > 0) {
+        console.log('[v0] First lead sample:', leadsArray[0]);
+      }
+      
+      setState((prev) => ({ ...prev, leads: leadsArray }));
     } catch (error) {
-      console.error('Failed to fetch leads:', error);
+      console.error('[v0] Failed to fetch leads:', error);
     }
   }, [state.spreadsheetId]);
 
