@@ -24,24 +24,25 @@ export async function POST(request: NextRequest) {
     // Create sheets API instance inside the function
     const sheets = google.sheets('v4');
 
-    // Read all leads
+    // Read all leads (full column range with your sheet structure)
     const response = await sheets.spreadsheets.values.get({
       auth,
       spreadsheetId,
-      range: 'Leads!A2:G1000',
+      range: 'Leads!A2:S1000',
     });
 
     const rows = response.data.values || [];
     const updates = [];
 
     // Process based on action
+    // Column mappings: P=Status(16), Q=Notes(17), R=Attempts(18), S=LastAttempt(19)
     switch (action) {
       case 'retry-no-answer': {
         // Reset all "no-answer" leads to "pending"
         rows.forEach((row, index) => {
-          if (row[3] === 'no-answer') {
+          if (row[16] === 'no-answer') {
             updates.push({
-              range: `Leads!D${index + 2}`,
+              range: `Leads!P${index + 2}`,
               values: [['pending']],
             });
           }
@@ -52,10 +53,10 @@ export async function POST(request: NextRequest) {
       case 'flag-no-answer': {
         // Add flag to all "no-answer" leads
         rows.forEach((row, index) => {
-          if (row[3] === 'no-answer') {
+          if (row[16] === 'no-answer') {
             updates.push({
-              range: `Leads!E${index + 2}`,
-              values: [[`${row[4] || ''}\n[FLAGGED FOR RETRY]`]],
+              range: `Leads!Q${index + 2}`,
+              values: [[`${row[17] || ''}\n[FLAGGED FOR RETRY]`]],
             });
           }
         });
@@ -65,14 +66,14 @@ export async function POST(request: NextRequest) {
       case 'mark-contacted': {
         // Mark all pending as contacted (no-answer)
         rows.forEach((row, index) => {
-          if (row[3] === 'pending') {
+          if (row[16] === 'pending') {
             updates.push({
-              range: `Leads!D${index + 2}`,
+              range: `Leads!P${index + 2}`,
               values: [['no-answer']],
             });
             updates.push({
-              range: `Leads!F${index + 2}`,
-              values: [[parseInt(row[5] || '0', 10) + 1]],
+              range: `Leads!R${index + 2}`,
+              values: [[parseInt(row[18] || '0', 10) + 1]],
             });
           }
         });
@@ -83,11 +84,11 @@ export async function POST(request: NextRequest) {
         // Reset all to pending
         rows.forEach((row, index) => {
           updates.push({
-            range: `Leads!D${index + 2}`,
+            range: `Leads!P${index + 2}`,
             values: [['pending']],
           });
           updates.push({
-            range: `Leads!E${index + 2}`,
+            range: `Leads!Q${index + 2}`,
             values: [['']],
           });
         });

@@ -27,24 +27,39 @@ export const readLeadsFromSheet = async (
 
   auth.setCredentials({ access_token: accessToken });
 
+  // Read all columns from A to S (your full sheet structure)
   const response = await sheets.spreadsheets.values.get({
     auth,
     spreadsheetId,
-    range: `${sheetName}!A2:F1000`,
+    range: `${sheetName}!A2:S1000`,
   });
 
   const rows = response.data.values || [];
   const leads: Lead[] = rows
-    .map((row, index) => ({
-      id: `lead-${index}`,
-      name: row[0] || '',
-      phone: row[1] || '',
-      email: row[2] || '',
-      status: (row[3] || 'pending') as Lead['status'],
-      notes: row[4] || '',
-      attempts: parseInt(row[5] || '0', 10),
-      rowIndex: index + 2, // Account for header row
-    }))
+    .map((row, index) => {
+      // Extract primary phone (first available from PHONE 1-5)
+      const phones = [
+        row[9],  // PHONE 1 (column J)
+        row[10], // PHONE 2 (column K)
+        row[11], // PHONE 3 (column L)
+        row[12], // PHONE 4 (column M)
+        row[13], // PHONE 5 (column N)
+      ].filter((p) => p && p.trim().length > 0);
+
+      const primaryPhone = phones[0] || '';
+
+      return {
+        id: `lead-${index}`,
+        name: row[5] || '', // Name (column F)
+        phone: primaryPhone,
+        email: row[4] || '', // Email Address (column E)
+        status: (row[16] || 'pending') as Lead['status'], // Status (column P)
+        notes: row[17] || '', // Notes (column Q)
+        attempts: parseInt(row[18] || '0', 10), // Attempts (column R)
+        lastAttempt: row[19] || '', // Last Attempt (column S)
+        rowIndex: index + 2, // Account for header row
+      };
+    })
     .filter((lead) => lead.phone.trim().length > 0);
 
   return leads;
@@ -72,30 +87,31 @@ export const updateLeadStatus = async (
 
   const updateData = [];
 
+  // Map updates to correct columns based on your sheet structure
   if (updates.status !== undefined) {
     updateData.push({
-      range: `${sheetName}!D${rowIndex}`,
+      range: `${sheetName}!P${rowIndex}`, // Status column
       values: [[updates.status]],
     });
   }
 
   if (updates.notes !== undefined) {
     updateData.push({
-      range: `${sheetName}!E${rowIndex}`,
+      range: `${sheetName}!Q${rowIndex}`, // Notes column
       values: [[updates.notes]],
     });
   }
 
   if (updates.attempts !== undefined) {
     updateData.push({
-      range: `${sheetName}!F${rowIndex}`,
+      range: `${sheetName}!R${rowIndex}`, // Attempts column
       values: [[updates.attempts]],
     });
   }
 
   if (updates.lastAttempt !== undefined) {
     updateData.push({
-      range: `${sheetName}!G${rowIndex}`,
+      range: `${sheetName}!S${rowIndex}`, // Last Attempt column
       values: [[updates.lastAttempt]],
     });
   }
