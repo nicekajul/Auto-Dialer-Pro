@@ -44,18 +44,22 @@ export const readLeadsFromSheet = async (
 
   // First row is headers
   const headers = allRows[0] || [];
-  console.log('[v0] Headers:', headers);
+  console.log('[v0] Headers array:', headers);
+  console.log('[v0] Headers with indices:', headers.map((h, i) => `${i}: ${h}`).join(' | '));
 
   // Find column indices dynamically by looking for header names
   const findColumnIndex = (searchTerms: string[]) => {
+    console.log('[v0] Searching for columns:', searchTerms);
     for (let i = 0; i < headers.length; i++) {
       const header = (headers[i] || '').toString().toLowerCase();
       for (const term of searchTerms) {
         if (header.includes(term.toLowerCase())) {
+          console.log(`[v0] Found "${term}" at index ${i}: "${headers[i]}"`);
           return i;
         }
       }
     }
+    console.log('[v0] No column found for:', searchTerms);
     return null;
   };
 
@@ -65,6 +69,7 @@ export const readLeadsFromSheet = async (
     const header = (headers[i] || '').toString().toLowerCase();
     if (header.includes('phone')) {
       phoneIndices.push(i);
+      console.log(`[v0] Found phone column at index ${i}: "${headers[i]}"`);
     }
   }
 
@@ -76,14 +81,16 @@ export const readLeadsFromSheet = async (
   const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
   const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
 
-  console.log('[v0] Column mapping:', {
-    name: nameColIndex,
-    email: emailColIndex,
-    phones: phoneIndices,
-    status: statusColIndex,
-    notes: notesColIndex,
-    attempts: attemptsColIndex,
-    lastAttempt: lastAttemptColIndex,
+  console.log('[v0] FINAL Column mapping:', {
+    nameColIndex,
+    nameColValue: headers[nameColIndex],
+    emailColIndex,
+    statusColIndex,
+    notesColIndex,
+    attemptsColIndex,
+    lastAttemptColIndex,
+    phoneIndices,
+    phoneValues: phoneIndices.map((i) => `${i}: ${headers[i]}`),
   });
 
   // Data rows start from index 1 (skip header at index 0)
@@ -102,15 +109,28 @@ export const readLeadsFromSheet = async (
       const primaryPhone = phones[0] || '';
       const leadName = (row[nameColIndex] || '').toString().trim();
 
+      // Log first few leads to verify data extraction
+      if (dataIndex < 3) {
+        console.log(`[v0] Lead ${dataIndex}:`, {
+          rawRow: row.slice(0, 20), // First 20 columns
+          nameColIndex,
+          leadName,
+          emailColIndex,
+          email: row[emailColIndex],
+          phones,
+          primaryPhone,
+        });
+      }
+
       // Debug Amanda Wilson
       if (leadName.includes('Amanda')) {
         console.log('[v0] Amanda Wilson found:', {
+          dataIndex,
           name: leadName,
           email: row[emailColIndex],
           phones: phones,
           selectedPhone: primaryPhone,
-          rowIndex: dataIndex + 2, // +2 because header is row 1, data starts at row 2
-          columnIndex: nameColIndex,
+          rowIndex: dataIndex + 2,
         });
       }
 
@@ -123,7 +143,7 @@ export const readLeadsFromSheet = async (
         notes: (row[notesColIndex] || '').toString().trim(),
         attempts: parseInt((row[attemptsColIndex] || '0').toString(), 10),
         lastAttempt: (row[lastAttemptColIndex] || '').toString().trim(),
-        rowIndex: dataIndex + 2, // Google Sheets row number (1-indexed, +1 for header)
+        rowIndex: dataIndex + 2,
       };
     })
     .filter((lead) => lead.phone.trim().length > 0 && lead.name.trim().length > 0);
