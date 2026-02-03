@@ -24,7 +24,59 @@ export async function POST(request: NextRequest) {
     // Create sheets API instance inside the function
     const sheets = google.sheets('v4');
 
-    // Read all leads (full column range with your sheet structure)
+    // Read headers first to find correct columns
+    const headerResponse = await sheets.spreadsheets.values.get({
+      auth,
+      spreadsheetId,
+      range: `'Lead mine 2026'!A1:S1`,
+    });
+
+    const headers = headerResponse.data.values?.[0] || [];
+
+    // Helper to find column index
+    const findColumnIndex = (searchTerms: string[]) => {
+      for (let i = 0; i < headers.length; i++) {
+        const header = (headers[i] || '').toString().toLowerCase();
+        for (const term of searchTerms) {
+          if (header.includes(term.toLowerCase())) {
+            return i;
+          }
+        }
+      }
+      return null;
+    };
+
+    // Find column indices
+    const statusColIndex = findColumnIndex(['status']) ?? 15;
+    const notesColIndex = findColumnIndex(['notes', 'note']) ?? 16;
+    const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
+
+    // Helper to convert column index to letter
+    const indexToLetter = (index: number) => {
+      let letter = '';
+      let num = index + 1; // 0-based to 1-based
+      while (num > 0) {
+        num--;
+        letter = String.fromCharCode(65 + (num % 26)) + letter;
+        num = Math.floor(num / 26);
+      }
+      return letter;
+    };
+
+    const statusCol = indexToLetter(statusColIndex);
+    const notesCol = indexToLetter(notesColIndex);
+    const attemptsCol = indexToLetter(attemptsColIndex);
+
+    console.log('[v0] Bulk API column mapping:', {
+      statusCol,
+      notesCol,
+      attemptsCol,
+      statusIndex: statusColIndex,
+      notesIndex: notesColIndex,
+      attemptsIndex: attemptsColIndex,
+    });
+
+    // Now read all data rows (A2 onwards, skipping header)
     const response = await sheets.spreadsheets.values.get({
       auth,
       spreadsheetId,
@@ -40,9 +92,9 @@ export async function POST(request: NextRequest) {
       case 'retry-no-answer': {
         // Reset all "no-answer" leads to "pending"
         rows.forEach((row, index) => {
-          if (row[16] === 'no-answer') {
+          if (row[statusColIndex] === 'no-answer') {
             updates.push({
-              range: `'Lead mine 2026'!P${index + 2}`,
+              range: `'Lead mine 2026'!${statusCol}${index + 2}`,
               values: [['pending']],
             });
           }
@@ -53,10 +105,10 @@ export async function POST(request: NextRequest) {
       case 'flag-no-answer': {
         // Add flag to all "no-answer" leads
         rows.forEach((row, index) => {
-          if (row[16] === 'no-answer') {
+          if (row[statusColIndex] === 'no-answer') {
             updates.push({
-              range: `'Lead mine 2026'!Q${index + 2}`,
-              values: [[`${row[17] || ''}\n[FLAGGED FOR RETRY]`]],
+              range: `'Lead mine 2026'!${notesCol}${index + 2}`,
+              values: [[`${row[notesColIndex] || ''}\n[FLAGGED FOR RETRY]`]],
             });
           }
         });
@@ -66,14 +118,14 @@ export async function POST(request: NextRequest) {
       case 'mark-contacted': {
         // Mark all pending as contacted (no-answer)
         rows.forEach((row, index) => {
-          if (row[16] === 'pending') {
+          if (row[statusColIndex] === 'pending') {
             updates.push({
-              range: `'Lead mine 2026'!P${index + 2}`,
+              range: `'Lead mine 2026'!${statusCol}${index + 2}`,
               values: [['no-answer']],
             });
             updates.push({
-              range: `'Lead mine 2026'!R${index + 2}`,
-              values: [[parseInt(row[18] || '0', 10) + 1]],
+              range: `'Lead mine 2026'!${attemptsCol}${index + 2}`,
+              values: [[parseInt(row[attemptsColIndex] || '0', 10) + 1]],
             });
           }
         });
@@ -84,11 +136,11 @@ export async function POST(request: NextRequest) {
         // Reset all to pending
         rows.forEach((row, index) => {
           updates.push({
-            range: `'Lead mine 2026'!P${index + 2}`,
+            range: `'Lead mine 2026'!${statusCol}${index + 2}`,
             values: [['pending']],
           });
           updates.push({
-            range: `'Lead mine 2026'!Q${index + 2}`,
+            range: `'Lead mine 2026'!${notesCol}${index + 2}`,
             values: [['']],
           });
         });

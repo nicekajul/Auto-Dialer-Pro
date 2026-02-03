@@ -27,54 +27,112 @@ export const readLeadsFromSheet = async (
 
   auth.setCredentials({ access_token: accessToken });
 
-  // Read all columns from A to S (your full sheet structure)
+  // Read ALL rows including header (A1:S1000)
   const response = await sheets.spreadsheets.values.get({
     auth,
     spreadsheetId,
-    range: `${sheetName}!A2:S1000`,
+    range: `${sheetName}!A1:S1000`,
   });
 
-  const rows = response.data.values || [];
-  console.log('[v0] Total rows fetched:', rows.length);
-  if (rows.length > 0) {
-    console.log('[v0] First row sample (all columns):', rows[0]);
-  }
+  const allRows = response.data.values || [];
+  console.log('[v0] Total rows fetched:', allRows.length);
   
-  const leads: Lead[] = rows
-    .map((row, index) => {
-      // Extract primary phone (first available from PHONE 1-5)
-      const phones = [
-        row[9],  // PHONE 1 (column J)
-        row[10], // PHONE 2 (column K)
-        row[11], // PHONE 3 (column L)
-        row[12], // PHONE 4 (column M)
-        row[13], // PHONE 5 (column N)
-      ].filter((p) => p && p.trim().length > 0);
+  if (allRows.length === 0) {
+    console.log('[v0] No data found in sheet');
+    return [];
+  }
+
+  // First row is headers
+  const headers = allRows[0] || [];
+  console.log('[v0] Headers:', headers);
+
+  // Find column indices dynamically by looking for header names
+  const findColumnIndex = (searchTerms: string[]) => {
+    for (let i = 0; i < headers.length; i++) {
+      const header = (headers[i] || '').toString().toLowerCase();
+      for (const term of searchTerms) {
+        if (header.includes(term.toLowerCase())) {
+          return i;
+        }
+      }
+    }
+    return null;
+  };
+
+  // Find all phone columns
+  const phoneIndices: number[] = [];
+  for (let i = 0; i < headers.length; i++) {
+    const header = (headers[i] || '').toString().toLowerCase();
+    if (header.includes('phone')) {
+      phoneIndices.push(i);
+    }
+  }
+
+  // Fallback defaults if headers not found
+  const nameColIndex = findColumnIndex(['name', 'contact name']) ?? 5;
+  const emailColIndex = findColumnIndex(['email', 'email address']) ?? 4;
+  const statusColIndex = findColumnIndex(['status']) ?? 15;
+  const notesColIndex = findColumnIndex(['notes', 'note']) ?? 16;
+  const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
+  const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
+
+  console.log('[v0] Column mapping:', {
+    name: nameColIndex,
+    email: emailColIndex,
+    phones: phoneIndices,
+    status: statusColIndex,
+    notes: notesColIndex,
+    attempts: attemptsColIndex,
+    lastAttempt: lastAttemptColIndex,
+  });
+
+  // Data rows start from index 1 (skip header at index 0)
+  const dataRows = allRows.slice(1);
+  
+  const leads: Lead[] = dataRows
+    .map((row, dataIndex) => {
+      // Extract phones from identified phone columns
+      const phones = phoneIndices
+        .map((idx) => {
+          const val = row[idx];
+          return val ? val.toString().trim() : '';
+        })
+        .filter((p) => p.length > 0);
 
       const primaryPhone = phones[0] || '';
-      const leadName = row[5] || '';
-      
-      // Debug: Log Amanda Wilson's phone and all row data
+      const leadName = (row[nameColIndex] || '').toString().trim();
+
+      // Debug Amanda Wilson
       if (leadName.includes('Amanda')) {
-        console.log('[v0] Amanda Wilson full row:', row);
-        console.log('[v0] Amanda Wilson - Index:', index, 'Name (col F/5):', row[5], 'Phones (cols J-N/9-13):', phones, 'Selected:', primaryPhone);
+        console.log('[v0] Amanda Wilson found:', {
+          name: leadName,
+          email: row[emailColIndex],
+          phones: phones,
+          selectedPhone: primaryPhone,
+          rowIndex: dataIndex + 2, // +2 because header is row 1, data starts at row 2
+          columnIndex: nameColIndex,
+        });
       }
 
       return {
-        id: `lead-${index}`,
-        name: leadName, // Name (column F)
+        id: `lead-${dataIndex}`,
+        name: leadName,
         phone: primaryPhone,
-        email: row[4] || '', // Email Address (column E)
-        status: (row[16] || 'pending') as Lead['status'], // Status (column P)
-        notes: row[17] || '', // Notes (column Q)
-        attempts: parseInt(row[18] || '0', 10), // Attempts (column R)
-        lastAttempt: row[19] || '', // Last Attempt (column S)
-        rowIndex: index + 2, // Account for header row
+        email: (row[emailColIndex] || '').toString().trim(),
+        status: ((row[statusColIndex] || 'pending').toString() as any) as Lead['status'],
+        notes: (row[notesColIndex] || '').toString().trim(),
+        attempts: parseInt((row[attemptsColIndex] || '0').toString(), 10),
+        lastAttempt: (row[lastAttemptColIndex] || '').toString().trim(),
+        rowIndex: dataIndex + 2, // Google Sheets row number (1-indexed, +1 for header)
       };
     })
-    .filter((lead) => lead.phone.trim().length > 0);
+    .filter((lead) => lead.phone.trim().length > 0 && lead.name.trim().length > 0);
 
-  console.log('[v0] Filtered leads count:', leads.length);
+  console.log('[v0] Final leads count:', leads.length);
+  if (leads.length > 0) {
+    console.log('[v0] First lead:', leads[0]);
+  }
+  
   return leads;
 };
 
@@ -98,38 +156,86 @@ export const updateLeadStatus = async (
 
   auth.setCredentials({ access_token: accessToken });
 
+  // Fetch headers to find correct column letters
+  const headerResponse = await sheets.spreadsheets.values.get({
+    auth,
+    spreadsheetId,
+    range: `${sheetName}!A1:S1`,
+  });
+
+  const headers = headerResponse.data.values?.[0] || [];
+
+  // Helper to convert column index to letter
+  const indexToLetter = (index: number) => {
+    let letter = '';
+    let num = index + 1; // 0-based to 1-based
+    while (num > 0) {
+      num--;
+      letter = String.fromCharCode(65 + (num % 26)) + letter;
+      num = Math.floor(num / 26);
+    }
+    return letter;
+  };
+
+  // Find column indices
+  const findColumnIndex = (searchTerms: string[]) => {
+    for (let i = 0; i < headers.length; i++) {
+      const header = (headers[i] || '').toString().toLowerCase();
+      for (const term of searchTerms) {
+        if (header.includes(term.toLowerCase())) {
+          return i;
+        }
+      }
+    }
+    return null;
+  };
+
+  const statusColIndex = findColumnIndex(['status']) ?? 15;
+  const notesColIndex = findColumnIndex(['notes', 'note']) ?? 16;
+  const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
+  const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
+
+  console.log('[v0] Update column mapping:', {
+    statusCol: indexToLetter(statusColIndex),
+    notesCol: indexToLetter(notesColIndex),
+    attemptsCol: indexToLetter(attemptsColIndex),
+    lastAttemptCol: indexToLetter(lastAttemptColIndex),
+    rowIndex: rowIndex,
+  });
+
   const updateData = [];
 
-  // Map updates to correct columns based on your sheet structure
   if (updates.status !== undefined) {
     updateData.push({
-      range: `${sheetName}!P${rowIndex}`, // Status column
+      range: `${sheetName}!${indexToLetter(statusColIndex)}${rowIndex}`,
       values: [[updates.status]],
     });
   }
 
   if (updates.notes !== undefined) {
     updateData.push({
-      range: `${sheetName}!Q${rowIndex}`, // Notes column
+      range: `${sheetName}!${indexToLetter(notesColIndex)}${rowIndex}`,
       values: [[updates.notes]],
     });
   }
 
   if (updates.attempts !== undefined) {
     updateData.push({
-      range: `${sheetName}!R${rowIndex}`, // Attempts column
+      range: `${sheetName}!${indexToLetter(attemptsColIndex)}${rowIndex}`,
       values: [[updates.attempts]],
     });
   }
 
   if (updates.lastAttempt !== undefined) {
     updateData.push({
-      range: `${sheetName}!S${rowIndex}`, // Last Attempt column
+      range: `${sheetName}!${indexToLetter(lastAttemptColIndex)}${rowIndex}`,
       values: [[updates.lastAttempt]],
     });
   }
 
   if (updateData.length === 0) return;
+
+  console.log('[v0] Updating with data:', updateData);
 
   await sheets.spreadsheets.values.batchUpdate({
     auth,
