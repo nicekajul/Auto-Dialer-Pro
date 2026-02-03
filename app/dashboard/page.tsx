@@ -42,6 +42,8 @@ export default function DashboardPage() {
         spreadsheetId: setup.spreadsheetId,
         agentName: setup.agentName,
       }));
+      // Store in window for components to access
+      (window as any).spreadsheetId = setup.spreadsheetId;
       setShowSetupModal(false);
     }
   }, []);
@@ -54,10 +56,21 @@ export default function DashboardPage() {
       const response = await fetch(
         `/api/leads?spreadsheetId=${encodeURIComponent(state.spreadsheetId)}`
       );
-      const leads = await response.json();
-      setState((prev) => ({ ...prev, leads }));
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+      const data = await response.json();
+      
+      // Ensure data is an array
+      const leadsArray = Array.isArray(data) ? data : [];
+      console.log('[v0] Fetched leads:', leadsArray.length, 'leads');
+      if (leadsArray.length > 0) {
+        console.log('[v0] First lead sample:', leadsArray[0]);
+      }
+      
+      setState((prev) => ({ ...prev, leads: leadsArray }));
     } catch (error) {
-      console.error('Failed to fetch leads:', error);
+      console.error('[v0] Failed to fetch leads:', error);
     }
   }, [state.spreadsheetId]);
 
@@ -94,7 +107,7 @@ export default function DashboardPage() {
     }));
   };
 
-  const handleCallComplete = (outcome: string, notes: string) => {
+  const handleCallComplete = async (outcome: string, notes: string) => {
     if (!state.currentLead) return;
 
     // Update lead status
@@ -108,23 +121,33 @@ export default function DashboardPage() {
       isAutoDialing: nextPendingLead ? true : false,
     }));
 
-    // Sync to Google Sheets
-    fetch('/api/leads', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        spreadsheetId: state.spreadsheetId,
-        rowIndex: state.currentLead.rowIndex,
-        updates: {
-          status: outcome,
-          notes,
-          attempts: (state.currentLead.attempts || 0) + 1,
-          lastAttempt: new Date().toISOString(),
-        },
-      }),
-    }).catch((error) => console.error('Failed to update lead:', error));
+    try {
+      // Sync to Google Sheets with proper error handling
+      const response = await fetch('/api/leads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spreadsheetId: state.spreadsheetId,
+          rowIndex: state.currentLead.rowIndex,
+          updates: {
+            status: outcome,
+            notes: notes || '', // Ensure notes are always sent, even if empty
+            attempts: (state.currentLead.attempts || 0) + 1,
+            lastAttempt: new Date().toISOString(),
+          },
+        }),
+      });
 
-    toast({ title: 'Success', description: `Lead marked as ${outcome}` });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log('[v0] Call data updated successfully for lead:', state.currentLead.name);
+      toast({ title: 'Success', description: `Lead marked as ${outcome}` });
+    } catch (error) {
+      console.error('[v0] Failed to update lead:', error);
+      toast({ title: 'Error', description: 'Failed to save call outcome' });
+    }
   };
 
   if (showSetupModal && state.spreadsheetId === null) {
