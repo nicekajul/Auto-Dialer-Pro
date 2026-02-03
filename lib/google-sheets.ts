@@ -4,6 +4,8 @@ export interface Lead {
   id: string;
   name: string;
   phone: string;
+  phones?: string[]; // All available phone numbers
+  currentPhoneIndex?: number; // Track which phone number we're on
   email: string;
   status: 'pending' | 'calling' | 'answered' | 'no-answer' | 'voicemail' | 'busy';
   notes: string;
@@ -134,6 +136,8 @@ export const readLeadsFromSheet = async (
         id: `lead-${dataIndex}`,
         name: leadName,
         phone: primaryPhone,
+        phones: phones, // Store all phone numbers
+        currentPhoneIndex: 0, // Start with first phone
         email: (row[emailColIndex] || '').toString().trim(),
         status: ((row[statusColIndex] || 'pending').toString() as any) as Lead['status'],
         notes: (row[notesColIndex] || '').toString().trim(),
