@@ -22,11 +22,11 @@ Perfect for testing before deployment.
 1. **Setup Google OAuth** → `QUICKSTART.md` (Step 1)
 2. **Create environment file** → `.env.local.example` (copy to `.env.local`)
 3. **Run locally**:
-   ```bash
+   \`\`\`bash
    npm install
    npm run dev
    # Open http://localhost:3000
-   ```
+   \`\`\`
 4. **Create Google Sheet** → `QUICKSTART.md` (Step 3)
 5. **Start dialing!**
 
@@ -72,17 +72,17 @@ Want all the details and best practices.
 ## ⚡ 5-Minute Quick Start
 
 ### 1️⃣ Google OAuth (2 min)
-```
+\`\`\`
 Console.cloud.google.com
   → Create Project
   → Enable Google Sheets API
   → Enable Google Drive API
   → Create OAuth Credentials
   → Save Client ID & Secret
-```
+\`\`\`
 
 ### 2️⃣ Environment Setup (1 min)
-```bash
+\`\`\`bash
 # Copy template
 cp .env.local.example .env.local
 
@@ -90,14 +90,14 @@ cp .env.local.example .env.local
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_id
 GOOGLE_CLIENT_SECRET=your_secret
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
-```
+\`\`\`
 
 ### 3️⃣ Run Locally (2 min)
-```bash
+\`\`\`bash
 npm install
 npm run dev
 # Visit http://localhost:3000
-```
+\`\`\`
 
 ### 4️⃣ First Test
 - Sign in with Google
@@ -348,22 +348,22 @@ You're successful when:
 **Choose One:**
 
 ### Option 1: Quick Test (Fastest)
-```bash
+\`\`\`bash
 npm install && npm run dev
 # Open http://localhost:3000 right now
 # Takes 2 minutes
-```
+\`\`\`
 
 ### Option 2: Full Setup (Recommended)
 Follow QUICKSTART.md step-by-step
-```
+\`\`\`
 Step 1: Google OAuth (2 min)
 Step 2: Environment Variables (1 min)
 Step 3: Create Google Sheet (1 min)
 Step 4: Install & Run (1 min)
 Step 5: Make First Call (1 min)
 Total: 6 minutes
-```
+\`\`\`
 
 ### Option 3: Deep Dive (Thorough)
 1. Read QUICKSTART.md (5 min)

@@ -60,17 +60,17 @@ No API credentials needed for click-to-dial mode.
 
 Create a `.env.local` file with:
 
-```
+\`\`\`
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your_client_secret_here
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
-```
+\`\`\`
 
 ## Installation & Deployment
 
 ### Local Development
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -79,18 +79,18 @@ npm install
 npm run dev
 
 # Open http://localhost:3000
-```
+\`\`\`
 
 ### Vercel Deployment
 
 1. **Push to GitHub**
-   ```bash
+   \`\`\`bash
    git init
    git add .
    git commit -m "Initial commit"
    git remote add origin <your-repo-url>
    git push -u origin main
-   ```
+   \`\`\`
 
 2. **Deploy to Vercel**
    - Go to [vercel.com](https://vercel.com)
@@ -142,11 +142,11 @@ npm run dev
 
 ### Data Flow
 
-```
+\`\`\`
 Your Browser → Google OAuth → Google Sheets API → Your Sheet
                 ↓                    ↓
             Secure Token      Read/Write Access
-```
+\`\`\`
 
 ### Column Descriptions
 
@@ -246,12 +246,12 @@ Your Browser → Google OAuth → Google Sheets API → Your Sheet
 
 Edit `/lib/ringcentral-dial.ts` to adjust phone number formatting for your region:
 
-```typescript
+\`\`\`typescript
 // Example: UK phone numbers
 export const formatPhoneNumber = (phoneNumber: string): string => {
   // Custom formatting logic here
 }
-```
+\`\`\`
 
 ### Extending Call Outcomes
 
@@ -266,12 +266,12 @@ To add new call outcome types:
 
 Modify charts in `/components/dashboard/analytics-dashboard.tsx`:
 
-```typescript
+\`\`\`typescript
 // Example: Add new chart type
 <BarChart data={customData}>
   {/* Your custom visualization */}
 </BarChart>
-```
+\`\`\`
 
 ## License & Attribution
 

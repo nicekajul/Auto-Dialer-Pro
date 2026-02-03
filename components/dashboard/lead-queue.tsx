@@ -155,19 +155,19 @@ export function LeadQueue({ leads }: LeadQueueProps) {
   return (
     <div className="space-y-6">
       {/* Pending Leads with Selection */}
-      <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-        <CardHeader>
+      <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
+        <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl">
+            <CardTitle className="text-xl font-bold text-white/90">
               Leads ({pendingLeads.length})
             </CardTitle>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-muted-foreground font-medium">
               Showing {(currentPage - 1) * PAGE_SIZE + 1} -{' '}
               {Math.min(currentPage * PAGE_SIZE, pendingLeads.length)}
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           {pendingLeads.length === 0 ? (
             <div className="text-center py-8">
               <Phone className="w-8 h-8 text-slate-600 mx-auto mb-2" />
@@ -176,22 +176,22 @@ export function LeadQueue({ leads }: LeadQueueProps) {
           ) : (
             <>
               {/* Selection Controls */}
-              <div className="flex items-center gap-3 pb-3 border-b border-slate-700">
+              <div className="flex items-center gap-3 pb-4 border-b border-border/30">
                 <Checkbox
                   checked={isAllSelectedOnPage}
                   onCheckedChange={handleSelectAll}
-                  className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
-                <span className="text-sm text-slate-400">Select all on page</span>
+                <span className="text-sm text-foreground/70 font-medium">Select all on page</span>
                 {selectedLeads.size > 0 && (
                   <>
-                    <span className="text-sm text-slate-300 ml-auto">
+                    <span className="text-sm text-foreground font-semibold ml-auto">
                       {selectedLeads.size} selected
                     </span>
                     <Button
                       onClick={handleSkipSelected}
                       disabled={isSkipping}
-                      className="bg-slate-700 hover:bg-slate-600 text-white"
+                      className="bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium"
                       size="sm"
                     >
                       {isSkipping ? 'Skipping...' : 'Skip Selected'}
@@ -209,7 +209,7 @@ export function LeadQueue({ leads }: LeadQueueProps) {
                         });
                         setSelectedLeads(new Set());
                       }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="gradient-primary hover:opacity-90 text-white font-medium"
                       size="sm"
                     >
                       Call Selected
@@ -219,25 +219,25 @@ export function LeadQueue({ leads }: LeadQueueProps) {
               </div>
 
               {/* Leads List */}
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2.5 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
                 {paginatedLeads.map((lead) => (
                   <div
                     key={lead.id}
-                    className="p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-3"
+                    className="p-4 glass rounded-lg hover:bg-primary/5 hover:border-primary/30 transition-all flex items-center gap-4 border border-transparent"
                   >
                     <Checkbox
                       checked={selectedLeads.has(lead.id)}
                       onCheckedChange={() => handleSelectLead(lead.id)}
-                      className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-slate-400">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2.5">
+                        <Badge className="bg-primary/20 text-primary border-0 px-2 py-0.5 font-bold text-xs">
                           {lead.attempts}
-                        </span>
-                        <h4 className="font-medium text-white">{lead.name}</h4>
+                        </Badge>
+                        <h4 className="font-semibold text-foreground truncate">{lead.name}</h4>
                       </div>
-                      <p className="text-sm text-slate-400">{lead.phone}</p>
+                      <p className="text-sm text-muted-foreground font-mono mt-1">{lead.phone}</p>
                     </div>
                   </div>
                 ))}
@@ -274,27 +274,29 @@ export function LeadQueue({ leads }: LeadQueueProps) {
 
       {/* Recently Contacted */}
       {contactedLeads.length > 0 && (
-        <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-xl">Recently Contacted ({contactedLeads.length})</CardTitle>
+        <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
+          <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardTitle className="text-xl font-bold text-white/90">
+              Recently Contacted ({contactedLeads.length})
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+          <CardContent className="pt-6">
+            <div className="space-y-2.5 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
               {contactedLeads.slice(0, 20).map((lead) => (
                 <div
                   key={lead.id}
-                  className="p-3 bg-slate-700/30 rounded-lg flex items-center justify-between"
+                  className="p-4 glass rounded-lg flex items-center justify-between gap-4 hover:bg-accent/5 transition-all"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-white truncate">{lead.name}</h4>
-                      <span className="text-xs text-slate-400 flex-shrink-0">
-                        Attempts: {lead.attempts}
-                      </span>
+                    <div className="flex items-center gap-2.5 mb-1.5">
+                      <h4 className="font-semibold text-foreground truncate">{lead.name}</h4>
+                      <Badge className="bg-primary/20 text-primary border-0 text-xs font-medium">
+                        {lead.attempts} attempts
+                      </Badge>
                     </div>
-                    <p className="text-sm text-slate-400">{lead.phone}</p>
+                    <p className="text-sm text-muted-foreground font-mono">{lead.phone}</p>
                   </div>
-                  <Badge className={`${statusColors[lead.status]} text-white flex-shrink-0 ml-2`}>
+                  <Badge className={`${statusColors[lead.status]} text-white flex-shrink-0 ml-2 font-medium px-3 py-1`}>
                     {statusLabels[lead.status]}
                   </Badge>
                 </div>

@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────┐
 │                         User Browser                             │
 ├─────────────────────────────────────────────────────────────────┤
@@ -62,7 +62,7 @@
          │   Google Sheets      │
          │   (Your Lead Data)   │
          └──────────────────────┘
-```
+\`\`\`
 
 ---
 
@@ -70,7 +70,7 @@
 
 ### Call Management Flow
 
-```
+\`\`\`
 ┌────────────────┐
 │  Load Leads    │
 │  from Sheet    │
@@ -130,13 +130,13 @@
     │  Next Lead Loads                     │
     │  (Auto or Manual)                    │
     └──────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Component Hierarchy
 
-```
+\`\`\`
 App (page.tsx)
 │
 ├─ Layout
@@ -178,13 +178,13 @@ App (page.tsx)
          ├─ Flag Leads
          ├─ Mark Contacted
          └─ Reset All
-```
+\`\`\`
 
 ---
 
 ## State Management Flow
 
-```
+\`\`\`
 ┌────────────────────────────────────────┐
 │     Dashboard State (React)            │
 ├────────────────────────────────────────┤
@@ -216,13 +216,13 @@ App (page.tsx)
     │  Re-render UI      │
     │  with new state    │
     └────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## API Endpoints Architecture
 
-```
+\`\`\`
 ┌────────────────────────────────────────────────────────┐
 │              Next.js API Routes                        │
 ├────────────────────────────────────────────────────────┤
@@ -249,13 +249,13 @@ App (page.tsx)
    │ OAuth   │   │ Sheets  │          │ Sheets   │
    │ Tokens  │   │ Read    │          │ Write    │
    └─────────┘   └─────────┘          └──────────┘
-```
+\`\`\`
 
 ---
 
 ## Google Sheets Integration
 
-```
+\`\`\`
 Your Google Sheet Structure:
 
 ┌──────┬────────┬────────┬─────────┬──────────┬──────────┬──────────┐
@@ -287,13 +287,13 @@ Write Flow:
 │ 4. Google Sheets updated immediately               │
 │ 5. Next refresh shows updated data                  │
 └─────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Authentication Flow (OAuth 2.0)
 
-```
+\`\`\`
 ┌──────────────┐
 │ User Browser │
 └──────┬───────┘
@@ -353,13 +353,13 @@ Session:
 │ 4. Retries original request             │
 │ 5. User doesn't notice interruption     │
 └─────────────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Real-Time Sync Mechanism
 
-```
+\`\`\`
 Dashboard mounted
 │
 ├─ Poll every 5 seconds ┐
@@ -401,13 +401,13 @@ Dashboard mounted
     │ Next poll         │
     │ reflects changes  │
     └───────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Error Handling Architecture
 
-```
+\`\`\`
 ┌─────────────────────────────────┐
 │ Application Layer Error         │
 ├─────────────────────────────────┤
@@ -456,13 +456,13 @@ Dashboard mounted
 │ - Action to take                │
 │ - App continues working         │
 └─────────────────────────────────┘
-```
+\`\`\`
 
 ---
 
 ## Performance Architecture
 
-```
+\`\`\`
 Load Time Optimization:
 ├─ Next.js Static Optimization
 │  ├─ Automatic code splitting
@@ -491,13 +491,13 @@ Runtime Performance:
    ├─ Reduced payload size
    ├─ Compression (gzip)
    └─ Connection pooling ready
-```
+\`\`\`
 
 ---
 
 ## Deployment Architecture
 
-```
+\`\`\`
 Local Development
 ├─ npm run dev
 ├─ Hot module reloading
@@ -519,13 +519,13 @@ Monitoring
 ├─ Performance monitoring
 ├─ Analytics (future: custom dashboard)
 └─ Access logs
-```
+\`\`\`
 
 ---
 
 ## Scalability Considerations
 
-```
+\`\`\`
 Current Architecture:
 ├─ Single database source (Google Sheets)
 ├─ Stateless API servers
@@ -551,7 +551,7 @@ Optimization Strategies:
 ├─ Add pagination for large lists
 ├─ Cache lead data locally
 └─ Batch bulk operations
-```
+\`\`\`
 
 ---
 

@@ -16,11 +16,11 @@
 
 Create `.env.local` in project root:
 
-```
+\`\`\`
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your_client_secret_here
 NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
-```
+\`\`\`
 
 ## Step 3: Create Google Sheet Template (1 min)
 
@@ -35,16 +35,16 @@ NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google-callback
    - G1: `Last Attempt`
 
 3. Add sample leads (Row 2+):
-   ```
+   \`\`\`
    John Smith | +1-555-123-4567 | john@example.com | pending | | 0 |
-   ```
+   \`\`\`
 
 4. Copy your Sheet ID from URL:
    `docs.google.com/spreadsheets/d/[SHEET_ID_HERE]/edit`
 
 ## Step 4: Install & Run (1 min)
 
-```bash
+\`\`\`bash
 # Install dependencies
 npm install
 
@@ -52,7 +52,7 @@ npm install
 npm run dev
 
 # Open http://localhost:3000
-```
+\`\`\`
 
 ## Step 5: First Call
 
@@ -94,7 +94,7 @@ npm run dev
 
 ## Deployment to Vercel (Optional)
 
-```bash
+\`\`\`bash
 # Push to GitHub
 git init && git add . && git commit -m "Initial"
 git remote add origin <your-repo>
@@ -109,7 +109,7 @@ vercel deploy
 # NEXT_PUBLIC_GOOGLE_REDIRECT_URI=https://your-project.vercel.app/api/auth/google-callback
 
 # Update Google OAuth redirect URI in Google Console
-```
+\`\`\`
 
 ## Next Steps
 

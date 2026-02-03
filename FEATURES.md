@@ -101,7 +101,7 @@
 ## 🎮 User Interface Flows
 
 ### Flow 1: Initial Setup
-```
+\`\`\`
 Login Page
     ↓
 Sign in with Google
@@ -109,10 +109,10 @@ Sign in with Google
 Setup Modal (Enter Sheet ID & Name)
     ↓
 Dashboard (Dialer Tab)
-```
+\`\`\`
 
 ### Flow 2: Making a Call
-```
+\`\`\`
 View Current Lead
     ↓
 Click "Click-to-Dial"
@@ -126,10 +126,10 @@ Select Call Outcome (Answered/No-Answer/Voicemail/Busy)
 Add Notes (Optional)
     ↓
 Next Lead Loads Automatically
-```
+\`\`\`
 
 ### Flow 3: Viewing Analytics
-```
+\`\`\`
 Dialer Tab
     ↓
 Click "Analytics" Tab
@@ -139,10 +139,10 @@ View Key Metrics & Charts
 Review Call Distribution
     ↓
 Check Attempt Frequency
-```
+\`\`\`
 
 ### Flow 4: Bulk Operations
-```
+\`\`\`
 Click "Actions" Tab
     ↓
 Select Bulk Action
@@ -152,14 +152,14 @@ Confirm Dialog
 Updates Applied
     ↓
 Success Notification
-```
+\`\`\`
 
 ---
 
 ## 📊 Data Models
 
 ### Lead Model
-```typescript
+\`\`\`typescript
 interface Lead {
   id: string;                    // Unique identifier
   name: string;                  // Contact name
@@ -171,10 +171,10 @@ interface Lead {
   lastAttempt?: string;          // ISO timestamp
   rowIndex: number;              // Google Sheet row
 }
-```
+\`\`\`
 
 ### Call Record Model
-```typescript
+\`\`\`typescript
 interface CallRecord {
   leadId: string;
   timestamp: string;             // ISO 8601 datetime
@@ -183,10 +183,10 @@ interface CallRecord {
   notes: string;
   agent: string;                 // Agent name
 }
-```
+\`\`\`
 
 ### Dashboard State
-```typescript
+\`\`\`typescript
 interface DashboardState {
   spreadsheetId: string | null;
   agentName: string | null;
@@ -194,7 +194,7 @@ interface DashboardState {
   currentLead: Lead | null;
   leads: Lead[];
 }
-```
+\`\`\`
 
 ---
 
@@ -224,7 +224,7 @@ Fetch all leads from sheet
 #### `PUT /api/leads`
 Update single lead
 - **Body**:
-  ```json
+  \`\`\`json
   {
     "spreadsheetId": "string",
     "rowIndex": number,
@@ -235,19 +235,19 @@ Update single lead
       "lastAttempt": "string"
     }
   }
-  ```
+  \`\`\`
 - **Response**: `{ success: true }`
 - **Purpose**: Sync call outcome to sheet
 
 #### `POST /api/leads/bulk`
 Perform bulk actions
 - **Body**:
-  ```json
+  \`\`\`json
   {
     "spreadsheetId": "string",
     "action": "retry-no-answer" | "flag-no-answer" | "mark-contacted" | "clear-all"
   }
-  ```
+  \`\`\`
 - **Response**: `{ success: true, updatesApplied: number }`
 - **Purpose**: Bulk lead status operations
 

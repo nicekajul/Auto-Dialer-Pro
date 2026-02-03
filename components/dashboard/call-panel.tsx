@@ -33,63 +33,63 @@ export function CallPanel({ currentLead, onCallComplete }: CallPanelProps) {
   };
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50 backdrop-blur sticky top-24">
-      <CardHeader>
-        <CardTitle className="text-lg">Call Outcome</CardTitle>
+    <Card className="glass-strong shadow-glow border-border/50 sticky top-24 overflow-hidden">
+      <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
+        <CardTitle className="text-lg font-bold text-white/90">Call Outcome</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         {/* Outcome Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <Button
             onClick={() => handleSubmit('answered')}
             disabled={!currentLead || isSubmitting}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white h-10"
+            className="gradient-accent shadow-glow-green hover:opacity-90 text-white h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <CheckCircle2 className="w-4 h-4 mr-1" />
+            <CheckCircle2 className="w-4 h-4 mr-1.5" />
             Answered
           </Button>
           <Button
             onClick={() => handleSubmit('no-answer')}
             disabled={!currentLead || isSubmitting}
-            className="bg-slate-600 hover:bg-slate-700 text-white h-10"
+            className="bg-secondary hover:bg-secondary/80 text-secondary-foreground h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <XCircle className="w-4 h-4 mr-1" />
+            <XCircle className="w-4 h-4 mr-1.5" />
             No Answer
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-3">
           <Button
             onClick={() => handleSubmit('voicemail')}
             disabled={!currentLead || isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 text-white h-10"
+            className="gradient-primary hover:opacity-90 text-white h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <MessageSquare className="w-4 h-4 mr-1" />
+            <MessageSquare className="w-4 h-4 mr-1.5" />
             Voicemail
           </Button>
           <Button
             onClick={() => handleSubmit('busy')}
             disabled={!currentLead || isSubmitting}
-            className="bg-orange-600 hover:bg-orange-700 text-white h-10"
+            className="bg-orange-600 hover:bg-orange-700 text-white h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Busy
           </Button>
         </div>
 
         {/* Notes Section */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-300">Notes</label>
+        <div className="space-y-2.5">
+          <label className="text-sm font-semibold text-foreground/90">Notes</label>
           <Textarea
             placeholder="Add notes about this call..."
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="bg-slate-700 border-slate-600 text-white min-h-24 resize-none"
+            className="glass-strong border-border/50 text-foreground min-h-28 resize-none focus:border-primary/50 transition-colors"
           />
         </div>
 
         {/* Quick Outcomes */}
-        <div className="space-y-2 pt-2 border-t border-slate-700">
-          <p className="text-xs font-medium text-slate-400 uppercase">Quick Flags</p>
+        <div className="space-y-3 pt-3 border-t border-border/30">
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Quick Flags</p>
           <div className="space-y-2">
             <Button
               onClick={() => {
@@ -98,7 +98,7 @@ export function CallPanel({ currentLead, onCallComplete }: CallPanelProps) {
               }}
               disabled={!currentLead || isSubmitting}
               variant="outline"
-              className="w-full border-slate-600 text-slate-300 h-8"
+              className="w-full border-primary/30 text-foreground h-10 hover:bg-primary/10 hover:border-primary/50 font-medium bg-transparent disabled:opacity-50"
             >
               Flag for Retry
             </Button>
