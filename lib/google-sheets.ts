@@ -44,22 +44,18 @@ export const readLeadsFromSheet = async (
 
   // First row is headers
   const headers = allRows[0] || [];
-  console.log('[v0] Headers array:', headers);
-  console.log('[v0] Headers with indices:', headers.map((h, i) => `${i}: ${h}`).join(' | '));
+  console.log('[v0] Headers:', headers);
 
   // Find column indices dynamically by looking for header names
   const findColumnIndex = (searchTerms: string[]) => {
-    console.log('[v0] Searching for columns:', searchTerms);
     for (let i = 0; i < headers.length; i++) {
       const header = (headers[i] || '').toString().toLowerCase();
       for (const term of searchTerms) {
         if (header.includes(term.toLowerCase())) {
-          console.log(`[v0] Found "${term}" at index ${i}: "${headers[i]}"`);
           return i;
         }
       }
     }
-    console.log('[v0] No column found for:', searchTerms);
     return null;
   };
 
@@ -69,28 +65,29 @@ export const readLeadsFromSheet = async (
     const header = (headers[i] || '').toString().toLowerCase();
     if (header.includes('phone')) {
       phoneIndices.push(i);
-      console.log(`[v0] Found phone column at index ${i}: "${headers[i]}"`);
     }
   }
 
-  // Fallback defaults if headers not found
-  const nameColIndex = findColumnIndex(['name', 'contact name']) ?? 5;
+  // Find First Name and Last Name columns (more reliable than Name column)
+  const firstNameColIndex = findColumnIndex(['first name', 'firstname']) ?? 6;
+  const lastNameColIndex = findColumnIndex(['last name', 'lastname']) ?? 7;
   const emailColIndex = findColumnIndex(['email', 'email address']) ?? 4;
   const statusColIndex = findColumnIndex(['status']) ?? 15;
   const notesColIndex = findColumnIndex(['notes', 'note']) ?? 16;
   const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
   const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
+  const nameColIndex = findColumnIndex(['name']) ?? 5; // Declare nameColIndex here
 
-  console.log('[v0] FINAL Column mapping:', {
-    nameColIndex,
-    nameColValue: headers[nameColIndex],
-    emailColIndex,
-    statusColIndex,
-    notesColIndex,
-    attemptsColIndex,
-    lastAttemptColIndex,
-    phoneIndices,
-    phoneValues: phoneIndices.map((i) => `${i}: ${headers[i]}`),
+  console.log('[v0] Column mapping:', {
+    firstName: firstNameColIndex,
+    lastName: lastNameColIndex,
+    email: emailColIndex,
+    phones: phoneIndices,
+    status: statusColIndex,
+    notes: notesColIndex,
+    attempts: attemptsColIndex,
+    lastAttempt: lastAttemptColIndex,
+    name: nameColIndex, // Include nameColIndex in the log
   });
 
   // Data rows start from index 1 (skip header at index 0)
@@ -107,30 +104,21 @@ export const readLeadsFromSheet = async (
         .filter((p) => p.length > 0);
 
       const primaryPhone = phones[0] || '';
-      const leadName = (row[nameColIndex] || '').toString().trim();
-
-      // Log first few leads to verify data extraction
-      if (dataIndex < 3) {
-        console.log(`[v0] Lead ${dataIndex}:`, {
-          rawRow: row.slice(0, 20), // First 20 columns
-          nameColIndex,
-          leadName,
-          emailColIndex,
-          email: row[emailColIndex],
-          phones,
-          primaryPhone,
-        });
-      }
+      
+      // Concatenate First Name + Last Name
+      const firstName = (row[firstNameColIndex] || '').toString().trim();
+      const lastName = (row[lastNameColIndex] || '').toString().trim();
+      const leadName = `${firstName} ${lastName}`.trim();
 
       // Debug Amanda Wilson
       if (leadName.includes('Amanda')) {
         console.log('[v0] Amanda Wilson found:', {
-          dataIndex,
           name: leadName,
           email: row[emailColIndex],
           phones: phones,
           selectedPhone: primaryPhone,
-          rowIndex: dataIndex + 2,
+          rowIndex: dataIndex + 2, // +2 because header is row 1, data starts at row 2
+          columnIndex: nameColIndex,
         });
       }
 
@@ -143,7 +131,7 @@ export const readLeadsFromSheet = async (
         notes: (row[notesColIndex] || '').toString().trim(),
         attempts: parseInt((row[attemptsColIndex] || '0').toString(), 10),
         lastAttempt: (row[lastAttemptColIndex] || '').toString().trim(),
-        rowIndex: dataIndex + 2,
+        rowIndex: dataIndex + 2, // Google Sheets row number (1-indexed, +1 for header)
       };
     })
     .filter((lead) => lead.phone.trim().length > 0 && lead.name.trim().length > 0);
