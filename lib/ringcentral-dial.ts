@@ -18,10 +18,20 @@ export const generateRingCentralDialURL = (options: ClickToDialOptions): string 
   const { phoneNumber, displayName, autoCall = true } = options;
 
   // Normalize phone number - remove non-numeric characters except leading +
-  const normalizedNumber = phoneNumber.replace(/[^\d+]/g, '');
+  let normalizedNumber = phoneNumber.replace(/[^\d+]/g, '');
 
-  // Ensure it starts with +
-  const formattedNumber = normalizedNumber.startsWith('+') ? normalizedNumber : `+${normalizedNumber}`;
+  // Add +1 for US numbers if not present (10 digit numbers without country code)
+  if (!normalizedNumber.startsWith('+')) {
+    if (normalizedNumber.length === 10) {
+      normalizedNumber = `+1${normalizedNumber}`;
+    } else if (normalizedNumber.length === 11 && normalizedNumber.startsWith('1')) {
+      normalizedNumber = `+${normalizedNumber}`;
+    } else {
+      normalizedNumber = `+${normalizedNumber}`;
+    }
+  }
+
+  const formattedNumber = normalizedNumber;
 
   // Build the URL based on platform
   // RingCentral supports multiple URL schemes:
@@ -39,9 +49,20 @@ export const generateRingCentralDialURL = (options: ClickToDialOptions): string 
  * Generate a tel: link as fallback
  */
 export const generateTelLink = (phoneNumber: string): string => {
-  const normalizedNumber = phoneNumber.replace(/[^\d+]/g, '');
-  const formattedNumber = normalizedNumber.startsWith('+') ? normalizedNumber : `+${normalizedNumber}`;
-  return `tel:${formattedNumber}`;
+  let normalizedNumber = phoneNumber.replace(/[^\d+]/g, '');
+  
+  // Add +1 for US numbers if not present
+  if (!normalizedNumber.startsWith('+')) {
+    if (normalizedNumber.length === 10) {
+      normalizedNumber = `+1${normalizedNumber}`;
+    } else if (normalizedNumber.length === 11 && normalizedNumber.startsWith('1')) {
+      normalizedNumber = `+${normalizedNumber}`;
+    } else {
+      normalizedNumber = `+${normalizedNumber}`;
+    }
+  }
+  
+  return `tel:${normalizedNumber}`;
 };
 
 /**
@@ -111,21 +132,23 @@ export const formatPhoneNumber = (phoneNumber: string): string => {
   if (cleaned.startsWith('+')) {
     const number = cleaned.slice(1);
     if (number.length === 10) {
+      // 10 digits without country code - add +1
       return `+1 (${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6)}`;
     }
     if (number.length === 11 && number.startsWith('1')) {
+      // 11 digits starting with 1 - format as US number
       return `+1 (${number.slice(1, 4)}) ${number.slice(4, 7)}-${number.slice(7)}`;
     }
     return `+${number}`;
   }
 
-  // Format US numbers
+  // Format US numbers without + prefix
   if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    return `+1 (${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
   }
   if (cleaned.length === 11 && cleaned.startsWith('1')) {
     const number = cleaned.slice(1);
-    return `(${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6)}`;
+    return `+1 (${number.slice(0, 3)}) ${number.slice(3, 6)}-${number.slice(6)}`;
   }
 
   return cleaned;

@@ -11,6 +11,8 @@ interface Lead {
   id: string;
   name: string;
   phone: string;
+  phones?: string[];
+  currentPhoneIndex?: number;
   email: string;
   status: string;
 }
@@ -20,6 +22,7 @@ interface AutoDialerUIProps {
   isAutoDialing: boolean;
   onStartDialing: () => void;
   onStopDialing: () => void;
+  onNextPhone?: () => void;
 }
 
 export function AutoDialerUI({
@@ -27,8 +30,15 @@ export function AutoDialerUI({
   isAutoDialing,
   onStartDialing,
   onStopDialing,
+  onNextPhone,
 }: AutoDialerUIProps) {
   const [callDuration, setCallDuration] = useState(0);
+  
+  // Get current phone and check if there are more phones
+  const currentPhoneIndex = currentLead?.currentPhoneIndex || 0;
+  const allPhones = currentLead?.phones || [currentLead?.phone].filter(Boolean);
+  const currentPhone = allPhones[currentPhoneIndex] || currentLead?.phone || '';
+  const hasMorePhones = allPhones.length > 1 && currentPhoneIndex < allPhones.length - 1;
 
   useEffect(() => {
     if (!isAutoDialing) {
@@ -87,8 +97,10 @@ export function AutoDialerUI({
                     <Phone className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs text-muted-foreground font-medium">Phone</p>
-                    <p className="font-mono text-white font-bold text-sm">{formatPhoneNumber(currentLead.phone)}</p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Phone {allPhones.length > 1 ? `${currentPhoneIndex + 1}/${allPhones.length}` : ''}
+                    </p>
+                    <p className="font-mono text-white font-bold text-sm">{formatPhoneNumber(currentPhone)}</p>
                   </div>
                   <ExternalLink className="w-3.5 h-3.5 text-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -107,14 +119,26 @@ export function AutoDialerUI({
 
             {/* Control Buttons */}
             <div className="space-y-3">
-              <Button
-                onClick={() => openClickToDial(currentLead.phone, currentLead.name)}
-                size="lg"
-                className="w-full gradient-primary hover:opacity-90 text-white h-14 font-bold text-base shadow-glow transition-all"
-              >
-                <Phone className="w-5 h-5 mr-2" />
-                Click-to-Dial
-              </Button>
+              <div className="grid grid-cols-1 gap-3">
+                <Button
+                  onClick={() => openClickToDial(currentPhone, currentLead.name)}
+                  size="lg"
+                  className="w-full gradient-primary hover:opacity-90 text-white h-14 font-bold text-base shadow-glow transition-all"
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  Click-to-Dial
+                </Button>
+                {hasMorePhones && onNextPhone && (
+                  <Button
+                    onClick={onNextPhone}
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-accent/50 text-accent h-12 font-semibold hover:bg-accent/10 bg-transparent"
+                  >
+                    Try Next Phone ({allPhones.length - currentPhoneIndex - 1} more)
+                  </Button>
+                )}
+              </div>
               {isAutoDialing ? (
                 <Button
                   onClick={onStopDialing}

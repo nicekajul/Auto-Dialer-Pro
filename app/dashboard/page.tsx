@@ -107,6 +107,37 @@ export default function DashboardPage() {
     }));
   };
 
+  const handleNextPhone = () => {
+    if (!state.currentLead) return;
+    
+    const currentIndex = state.currentLead.currentPhoneIndex || 0;
+    const phones = state.currentLead.phones || [state.currentLead.phone];
+    
+    if (currentIndex < phones.length - 1) {
+      setState((prev) => ({
+        ...prev,
+        currentLead: prev.currentLead ? {
+          ...prev.currentLead,
+          currentPhoneIndex: currentIndex + 1,
+          phone: phones[currentIndex + 1],
+        } : null,
+      }));
+      toast({
+        title: 'Phone Switched',
+        description: `Now dialing phone ${currentIndex + 2} of ${phones.length}`,
+      });
+    }
+  };
+
+  const handleCallLead = (lead: any) => {
+    setState((prev) => ({
+      ...prev,
+      currentLead: lead,
+      isAutoDialing: true,
+    }));
+    setActiveTab('dialer');
+  };
+
   const handleCallComplete = async (outcome: string, notes: string) => {
     if (!state.currentLead) return;
 
@@ -168,6 +199,7 @@ export default function DashboardPage() {
                 isAutoDialing={state.isAutoDialing}
                 onStartDialing={handleStartDialing}
                 onStopDialing={handleStopDialing}
+                onNextPhone={handleNextPhone}
               />
             </div>
             <div>
@@ -179,7 +211,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {activeTab === 'queue' && <LeadQueue leads={state.leads} />}
+        {activeTab === 'queue' && <LeadQueue leads={state.leads} onCallLead={handleCallLead} />}
 
         {activeTab === 'analytics' && <AnalyticsDashboard leads={state.leads} />}
 

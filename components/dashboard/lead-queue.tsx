@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Phone } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Phone, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Lead {
@@ -20,6 +21,7 @@ interface Lead {
 
 interface LeadQueueProps {
   leads: Lead[];
+  onCallLead?: (lead: Lead) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -42,14 +44,27 @@ const statusLabels: Record<string, string> = {
 
 const PAGE_SIZE = 25;
 
-export function LeadQueue({ leads }: LeadQueueProps) {
+export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [isSkipping, setIsSkipping] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
 
   // Filter pending leads and sort by date
-  const pendingLeads = leads.filter((l) => l.status === 'pending');
+  const allPendingLeads = leads.filter((l) => l.status === 'pending');
+  
+  // Apply search filter
+  const pendingLeads = allPendingLeads.filter((lead) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      lead.name.toLowerCase().includes(query) ||
+      lead.phone.includes(query) ||
+      lead.email.toLowerCase().includes(query)
+    );
+  });
+  
   const contactedLeads = leads.filter((l) => l.status !== 'pending');
 
   // Paginate pending leads
@@ -156,7 +171,7 @@ export function LeadQueue({ leads }: LeadQueueProps) {
     <div className="space-y-6">
       {/* Pending Leads with Selection */}
       <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
-        <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
+        <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent space-y-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-bold text-white/90">
               Leads ({pendingLeads.length})
@@ -165,6 +180,19 @@ export function LeadQueue({ leads }: LeadQueueProps) {
               Showing {(currentPage - 1) * PAGE_SIZE + 1} -{' '}
               {Math.min(currentPage * PAGE_SIZE, pendingLeads.length)}
             </div>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by name, phone, or email..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
+              className="pl-10 glass-strong border-border/50 text-foreground"
+            />
           </div>
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
@@ -239,6 +267,16 @@ export function LeadQueue({ leads }: LeadQueueProps) {
                       </div>
                       <p className="text-sm text-muted-foreground font-mono mt-1">{lead.phone}</p>
                     </div>
+                    {onCallLead && (
+                      <Button
+                        onClick={() => onCallLead(lead)}
+                        size="sm"
+                        className="gradient-primary hover:opacity-90 text-white font-semibold"
+                      >
+                        <Phone className="w-4 h-4 mr-1" />
+                        Call
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>

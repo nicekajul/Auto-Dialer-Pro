@@ -51,16 +51,16 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
   };
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-      <CardHeader>
-        <CardTitle className="text-lg">Bulk Actions</CardTitle>
+    <Card className="glass-strong border-border shadow-lg">
+      <CardHeader className="border-b border-border/50">
+        <CardTitle className="text-xl font-bold text-foreground">Bulk Actions</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-6">
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
               disabled={isLoading || !spreadsheetId}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white h-10 justify-start"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white h-12 justify-center font-semibold"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Retry All No-Answer Leads
@@ -87,16 +87,16 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
           <AlertDialogTrigger asChild>
             <Button
               disabled={isLoading || !spreadsheetId}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white h-10 justify-start"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white h-12 justify-center font-semibold"
             >
               <Flag className="w-4 h-4 mr-2" />
-              Flag No-Answer for Follow-up
+              Flag No-Answer
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-slate-800 border-slate-700">
+          <AlertDialogContent className="glass-strong border-border">
             <AlertDialogHeader>
-              <AlertDialogTitle>Add Flag to No-Answer Leads?</AlertDialogTitle>
-              <AlertDialogDescription className="text-slate-400">
+              <AlertDialogTitle className="text-foreground">Add Flag to No-Answer Leads?</AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
                 This will add a follow-up flag to all no-answer calls for later contact.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -106,7 +106,7 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
             >
               Continue
             </AlertDialogAction>
-            <AlertDialogCancel className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
           </AlertDialogContent>
         </AlertDialog>
 
@@ -114,16 +114,16 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
           <AlertDialogTrigger asChild>
             <Button
               disabled={isLoading || !spreadsheetId}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-10 justify-start"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 justify-center font-semibold"
             >
               <CheckCircle className="w-4 h-4 mr-2" />
-              Mark All as Contacted
+              Mark All Contacted
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent className="bg-slate-800 border-slate-700">
+          <AlertDialogContent className="glass-strong border-border">
             <AlertDialogHeader>
-              <AlertDialogTitle>Mark All as Contacted?</AlertDialogTitle>
-              <AlertDialogDescription className="text-slate-400">
+              <AlertDialogTitle className="text-foreground">Mark All as Contacted?</AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
                 This will mark all pending leads as "no-answer" and increment attempt counts.
               </AlertDialogDescription>
             </AlertDialogHeader>
@@ -133,7 +133,7 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
             >
               Continue
             </AlertDialogAction>
-            <AlertDialogCancel className="border-slate-600">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
           </AlertDialogContent>
         </AlertDialog>
 
@@ -142,7 +142,7 @@ export function BulkActions({ spreadsheetId, onActionsComplete }: BulkActionsPro
             <Button
               disabled={isLoading || !spreadsheetId}
               variant="outline"
-              className="w-full border-red-600 text-red-400 hover:bg-red-950 h-10 justify-start bg-transparent"
+              className="w-full border-red-600 text-red-400 hover:bg-red-950 h-12 justify-center font-semibold bg-transparent"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Reset All
