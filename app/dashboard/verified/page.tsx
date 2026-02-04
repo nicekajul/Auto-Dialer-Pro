@@ -4,15 +4,23 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LeadDetailModal } from '@/components/dashboard/lead-detail-modal';
-import { Search, CheckCircle, Calendar, Phone, User } from 'lucide-react';
+import { Search, CheckCircle, Calendar, Phone, User, Download } from 'lucide-react';
+
+interface PhoneAttempt {
+    phone: string;
+    outcome: string | null;
+    timestamp?: string;
+}
 
 interface Lead {
     id: string;
     name: string;
     phone: string;
     phones?: string[];
+    phoneAttempts?: PhoneAttempt[];
     email: string;
     status: string;
     notes: string;
@@ -77,6 +85,52 @@ export default function VerifiedLeadsPage() {
         );
     });
 
+    const getVerifiedPhone = (lead: Lead): string => {
+        // If we have explicit attempt history, look for the phone marked as verified
+        if (lead.phoneAttempts && lead.phoneAttempts.length > 0) {
+            const verifiedAttempt = lead.phoneAttempts.find(p => p.outcome === 'verified');
+            if (verifiedAttempt) {
+                return verifiedAttempt.phone;
+            }
+        }
+        // Fallback: if status is verified but no explicit history match (e.g. single phone lead), return primary phone
+        return lead.phone;
+    };
+
+    const downloadVerifiedCSV = () => {
+        const headers = ['Name', 'Verified Phone', 'Email', 'Notes', 'Verification Date'];
+        const csvContent = [
+            headers.join(','),
+            ...filteredLeads.map(lead => {
+                const verifiedPhone = getVerifiedPhone(lead);
+                const date = lead.lastAttempt ? new Date(lead.lastAttempt).toLocaleDateString() : '';
+                // Escape fields that might contain commas
+                const cleanName = `"${lead.name.replace(/"/g, '""')}"`;
+                const cleanNotes = `"${lead.notes.replace(/"/g, '""').replace(/\n/g, ' ')}"`; // Newline matching fix
+
+                return [
+                    cleanName,
+                    verifiedPhone,
+                    lead.email,
+                    cleanNotes,
+                    date
+                ].join(',');
+            })
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'verified_leads.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     const handleViewLead = (lead: Lead) => {
         setSelectedLead(lead);
         setIsModalOpen(true);
@@ -101,9 +155,19 @@ export default function VerifiedLeadsPage() {
                                     Successfully verified and qualified contacts
                                 </p>
                             </div>
-                            <Badge className="bg-green-600 text-white px-4 py-2 text-lg font-bold">
-                                {filteredLeads.length} Total
-                            </Badge>
+                            <div className="flex items-center gap-3">
+                                <Button
+                                    onClick={downloadVerifiedCSV}
+                                    variant="outline"
+                                    className="gap-2 border-green-500/30 hover:bg-green-500/10 hover:text-green-600"
+                                >
+                                    <Download className="w-4 h-4" />
+                                    Export CSV
+                                </Button>
+                                <Badge className="bg-green-600 text-white px-4 py-2 text-lg font-bold">
+                                    {filteredLeads.length} Total
+                                </Badge>
+                            </div>
                         </div>
 
                         <div className="relative">

@@ -216,6 +216,146 @@ export const readLeadsFromSheet = async (
   return leads;
 };
 
+// Helper to get or create the Archive sheet
+const getOrCreateArchiveSheet = async (
+  auth: any,
+  spreadsheetId: string,
+  archiveSheetName: string = 'Archived Leads'
+) => {
+  const metadata = await sheets.spreadsheets.get({
+    auth,
+    spreadsheetId,
+  });
+
+  const sheet = metadata.data.sheets?.find(
+    (s) => s.properties?.title === archiveSheetName
+  );
+
+  if (!sheet) {
+    // Create the sheet
+    await sheets.spreadsheets.batchUpdate({
+      auth,
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            addSheet: {
+              properties: {
+                title: archiveSheetName,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    // Copy headers from main sheet (assuming row 1 is headers)
+    const mainSheetName = 'Lead mine 2026'; // Should ideally be passed in or dynamic
+    const headerResponse = await sheets.spreadsheets.values.get({
+      auth,
+      spreadsheetId,
+      range: `${mainSheetName}!A1:Z1`,
+    });
+
+    if (headerResponse.data.values && headerResponse.data.values.length > 0) {
+      await sheets.spreadsheets.values.update({
+        auth,
+        spreadsheetId,
+        range: `${archiveSheetName}!A1`,
+        valueInputOption: 'RAW',
+        requestBody: {
+          values: headerResponse.data.values,
+        },
+      });
+    }
+  }
+
+  return archiveSheetName;
+};
+
+// Archive a lead by moving it to the Archive sheet and clearing it from the main sheet
+const archiveLead = async (
+  auth: any,
+  spreadsheetId: string,
+  rowIndex: number,
+  mainSheetName: string,
+  updates: any
+) => {
+  const archiveSheetName = await getOrCreateArchiveSheet(auth, spreadsheetId);
+
+  // 1. Read the full row data
+  const rowResponse = await sheets.spreadsheets.values.get({
+    auth,
+    spreadsheetId,
+    range: `${mainSheetName}!A${rowIndex}:Z${rowIndex}`,
+  });
+
+  const rowData = rowResponse.data.values?.[0];
+  if (!rowData) {
+    console.error('[v0] Failed to read row data for archiving');
+    return;
+  }
+
+  // 2. Prepare the row for archive (apply the updates first!)
+  // We need to know column indices to apply updates to the in-memory row data before archiving
+  // For simplicity, we'll append the updates to the end if we can't map them, 
+  // OR strictly relying on the standard columns?
+  // Proper way: We have the headers code in updateLeadStatus.
+  // We should probably just overwrite the row in the archive with the *current* row data
+  // plus the applied updates.
+
+  // Re-fetch headers to map updates to indices
+  const headerResponse = await sheets.spreadsheets.values.get({
+    auth,
+    spreadsheetId,
+    range: `${mainSheetName}!A1:Z1`,
+  });
+  const headers = headerResponse.data.values?.[0] || [];
+
+  // Helper to find index
+  const findIdx = (terms: string[]) => {
+    for (let i = 0; i < headers.length; i++) {
+      if (terms.some(t => headers[i].toLowerCase().includes(t))) return i;
+    }
+    return -1;
+  };
+
+  const statusIdx = findIdx(['status']);
+  const notesIdx = findIdx(['notes', 'note']);
+  const attemptsIdx = findIdx(['attempts', 'attempt']);
+  const lastAttemptIdx = findIdx(['last attempt', 'last called']);
+
+  // Apply updates to the row data array
+  // Extend rowData if it's shorter than the index
+  const maxIdx = Math.max(statusIdx, notesIdx, attemptsIdx, lastAttemptIdx);
+  while (rowData.length <= maxIdx) rowData.push('');
+
+  if (updates.status && statusIdx !== -1) rowData[statusIdx] = updates.status;
+  if (updates.notes && notesIdx !== -1) rowData[notesIdx] = updates.notes;
+  if (updates.attempts !== undefined && attemptsIdx !== -1) rowData[attemptsIdx] = updates.attempts.toString();
+  if (updates.lastAttempt && lastAttemptIdx !== -1) rowData[lastAttemptIdx] = updates.lastAttempt;
+
+  // 3. Append to Archive Sheet
+  await sheets.spreadsheets.values.append({
+    auth,
+    spreadsheetId,
+    range: `${archiveSheetName}!A1`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [rowData],
+    },
+  });
+
+  // 4. Clear the row in Main Sheet
+  await sheets.spreadsheets.values.clear({
+    auth,
+    spreadsheetId,
+    range: `${mainSheetName}!A${rowIndex}:Z${rowIndex}`,
+  });
+
+  console.log(`[v0] Lead at row ${rowIndex} archived to ${archiveSheetName}`);
+};
+
 export const updateLeadStatus = async (
   accessToken: string,
   spreadsheetId: string,
@@ -236,6 +376,14 @@ export const updateLeadStatus = async (
 
   auth.setCredentials({ access_token: accessToken });
 
+  // CHECK FOR AUTO-ARCHIVE
+  if (updates.status === 'disconnected' || updates.status === 'not-in-service') {
+    console.log(`[v0] Status is ${updates.status}. Initiating auto-archive for row ${rowIndex}...`);
+    await archiveLead(auth, spreadsheetId, rowIndex, sheetName, updates);
+    return;
+  }
+
+  // Normal Update Logic
   // Fetch headers to find correct column letters
   const headerResponse = await sheets.spreadsheets.values.get({
     auth,
