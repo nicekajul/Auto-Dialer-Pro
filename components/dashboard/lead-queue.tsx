@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Phone, Search } from 'lucide-react';
+import { Phone, Search, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Lead {
@@ -22,6 +22,7 @@ interface Lead {
 interface LeadQueueProps {
   leads: Lead[];
   onCallLead?: (lead: Lead) => void;
+  onViewLead?: (lead: Lead) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -31,6 +32,9 @@ const statusColors: Record<string, string> = {
   'no-answer': 'bg-red-600',
   voicemail: 'bg-amber-600',
   busy: 'bg-orange-600',
+  disconnected: 'bg-red-700',
+  'not-in-service': 'bg-purple-600',
+  verified: 'bg-green-600',
 };
 
 const statusLabels: Record<string, string> = {
@@ -40,11 +44,14 @@ const statusLabels: Record<string, string> = {
   'no-answer': 'No Answer',
   voicemail: 'Voicemail',
   busy: 'Busy',
+  disconnected: 'Disconnected',
+  'not-in-service': 'Not in Service',
+  verified: 'Verified',
 };
 
 const PAGE_SIZE = 25;
 
-export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
+export function LeadQueue({ leads, onCallLead, onViewLead }: LeadQueueProps) {
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [isSkipping, setIsSkipping] = useState(false);
@@ -53,7 +60,7 @@ export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
 
   // Filter pending leads and sort by date
   const allPendingLeads = leads.filter((l) => l.status === 'pending');
-  
+
   // Apply search filter
   const pendingLeads = allPendingLeads.filter((lead) => {
     if (!searchQuery.trim()) return true;
@@ -64,7 +71,7 @@ export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
       lead.email.toLowerCase().includes(query)
     );
   });
-  
+
   const contactedLeads = leads.filter((l) => l.status !== 'pending');
 
   // Paginate pending leads
@@ -173,7 +180,7 @@ export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
       <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
         <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent space-y-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl font-bold text-white/90">
+            <CardTitle className="text-xl font-bold text-black/90">
               Leads ({pendingLeads.length})
             </CardTitle>
             <div className="text-sm text-muted-foreground font-medium">
@@ -267,16 +274,29 @@ export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
                       </div>
                       <p className="text-sm text-muted-foreground font-mono mt-1">{lead.phone}</p>
                     </div>
-                    {onCallLead && (
-                      <Button
-                        onClick={() => onCallLead(lead)}
-                        size="sm"
-                        className="gradient-primary hover:opacity-90 text-white font-semibold"
-                      >
-                        <Phone className="w-4 h-4 mr-1" />
-                        Call
-                      </Button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {onViewLead && (
+                        <Button
+                          onClick={() => onViewLead(lead)}
+                          size="sm"
+                          variant="outline"
+                          className="border-primary/30 text-foreground hover:bg-primary/10 hover:border-primary/50 font-medium"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      )}
+                      {onCallLead && (
+                        <Button
+                          onClick={() => onCallLead(lead)}
+                          size="sm"
+                          className="gradient-primary hover:opacity-90 text-white font-semibold"
+                        >
+                          <Phone className="w-4 h-4 mr-1" />
+                          Call
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -314,7 +334,7 @@ export function LeadQueue({ leads, onCallLead }: LeadQueueProps) {
       {contactedLeads.length > 0 && (
         <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
           <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardTitle className="text-xl font-bold text-white/90">
+            <CardTitle className="text-xl font-bold text-black/90">
               Recently Contacted ({contactedLeads.length})
             </CardTitle>
           </CardHeader>

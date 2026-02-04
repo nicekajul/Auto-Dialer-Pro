@@ -20,6 +20,9 @@ const COLORS = {
   voicemail: '#f59e0b',
   busy: '#f97316',
   pending: '#64748b',
+  disconnected: '#b91c1c',
+  'not-in-service': '#9333ea',
+  verified: '#059669',
 };
 
 export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
@@ -34,6 +37,9 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
     voicemail: leadsArray.filter((l) => l.status === 'voicemail').length,
     busy: leadsArray.filter((l) => l.status === 'busy').length,
     pending: leadsArray.filter((l) => l.status === 'pending').length,
+    disconnected: leadsArray.filter((l) => l.status === 'disconnected').length,
+    notInService: leadsArray.filter((l) => l.status === 'not-in-service').length,
+    verified: leadsArray.filter((l) => l.status === 'verified').length,
   };
 
   const contactRate =
@@ -45,6 +51,9 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
     { name: 'Voicemail', value: stats.voicemail },
     { name: 'Busy', value: stats.busy },
     { name: 'Pending', value: stats.pending },
+    { name: 'Disconnected', value: stats.disconnected },
+    { name: 'Not in Service', value: stats.notInService },
+    { name: 'Verified', value: stats.verified },
   ].filter((item) => item.value > 0);
 
   const attemptsData = [
@@ -103,12 +112,12 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
           <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie 
-                  data={pieData} 
-                  cx="50%" 
-                  cy="50%" 
-                  innerRadius={60} 
-                  outerRadius={100} 
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
                   dataKey="value"
                   label={(entry) => entry.name}
                   labelLine={false}
@@ -117,21 +126,21 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
                     <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '2px solid #e5e7eb', 
-                    borderRadius: '8px', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     color: '#111827',
                     fontWeight: 600
-                  }} 
+                  }}
                 />
-                <Legend 
-                  wrapperStyle={{ 
+                <Legend
+                  wrapperStyle={{
                     color: '#111827',
                     fontWeight: 600,
                     fontSize: '14px'
-                  }} 
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -147,23 +156,23 @@ export function AnalyticsDashboard({ leads }: AnalyticsDashboardProps) {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={attemptsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#d1d5db" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   stroke="#374151"
                   style={{ fontSize: '14px', fontWeight: 600 }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="#374151"
                   style={{ fontSize: '14px', fontWeight: 600 }}
                 />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '2px solid #e5e7eb', 
-                    borderRadius: '8px', 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     color: '#111827',
                     fontWeight: 600
-                  }} 
+                  }}
                 />
                 <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
               </BarChart>

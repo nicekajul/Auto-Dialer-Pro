@@ -1,13 +1,21 @@
 import { google } from 'googleapis';
 
+export interface PhoneAttempt {
+  phone: string;
+  outcome: string | null;
+  timestamp?: string;
+  notes?: string;
+}
+
 export interface Lead {
   id: string;
   name: string;
   phone: string;
   phones?: string[]; // All available phone numbers
   currentPhoneIndex?: number; // Track which phone number we're on
+  phoneAttempts?: PhoneAttempt[];
   email: string;
-  status: 'pending' | 'calling' | 'answered' | 'no-answer' | 'voicemail' | 'busy';
+  status: 'pending' | 'calling' | 'answered' | 'no-answer' | 'voicemail' | 'busy' | 'disconnected' | 'not-in-service' | 'verified';
   notes: string;
   attempts: number;
   lastAttempt?: string;
@@ -15,6 +23,39 @@ export interface Lead {
 }
 
 const sheets = google.sheets('v4');
+
+// Helper function to parse phone attempts from notes
+function parsePhoneAttempts(notes: string): PhoneAttempt[] {
+  if (!notes) return [];
+
+  const phoneAttempts: PhoneAttempt[] = [];
+
+  // Look for [Phone Attempts] section
+  const match = notes.match(/\[Phone Attempts\]([\s\S]*?)(?:\n\n|\[|$)/);
+  if (!match) return [];
+
+  const attemptsSection = match[1].trim();
+  const lines = attemptsSection.split('\n');
+
+  lines.forEach((line) => {
+    // Parse format: "(404) 419-2659: Not in Service (2/5/2026, 3:36:13 AM)"
+    // or: "phone: outcome (timestamp)"
+    const phoneMatch = line.match(/^(.+?):\s*(.+?)\s*\((.+?)\)\s*$/);
+    if (phoneMatch) {
+      const phone = phoneMatch[1].trim();
+      const outcome = phoneMatch[2].trim().toLowerCase().replace(/\s+/g, '-');
+      const timestamp = phoneMatch[3].trim();
+
+      phoneAttempts.push({
+        phone,
+        outcome,
+        timestamp,
+      });
+    }
+  });
+
+  return phoneAttempts;
+}
 
 export const readLeadsFromSheet = async (
   accessToken: string,
@@ -38,7 +79,7 @@ export const readLeadsFromSheet = async (
 
   const allRows = response.data.values || [];
   console.log('[v0] Total rows fetched:', allRows.length);
-  
+
   if (allRows.length === 0) {
     console.log('[v0] No data found in sheet');
     return [];
@@ -102,7 +143,7 @@ export const readLeadsFromSheet = async (
 
   // Data rows start from index 1 (skip header at index 0)
   const dataRows = allRows.slice(1);
-  
+
   const leads: Lead[] = dataRows
     .map((row, dataIndex) => {
       // Extract phones from identified phone columns
@@ -114,7 +155,7 @@ export const readLeadsFromSheet = async (
         .filter((p) => p.length > 0);
 
       const primaryPhone = phones[0] || '';
-      
+
       // Concatenate First Name + Last Name
       const firstName = (row[firstNameColIndex] || '').toString().trim();
       const lastName = (row[lastNameColIndex] || '').toString().trim();
@@ -132,18 +173,28 @@ export const readLeadsFromSheet = async (
         });
       }
 
+      const email = (row[emailColIndex] || '').toString().trim();
+      const status = (row[statusColIndex] || 'pending').toString();
+      const notes = (row[notesColIndex] || '').toString().trim();
+      const attempts = parseInt((row[attemptsColIndex] || '0').toString(), 10);
+      const lastAttempt = (row[lastAttemptColIndex] || '').toString().trim();
+
+      // Parse phone attempts from notes
+      const phoneAttempts = parsePhoneAttempts(notes);
+
       return {
         id: `lead-${dataIndex}`,
+        rowIndex: dataIndex + 2,
         name: leadName,
         phone: primaryPhone,
-        phones: phones, // Store all phone numbers
-        currentPhoneIndex: 0, // Start with first phone
-        email: (row[emailColIndex] || '').toString().trim(),
-        status: ((row[statusColIndex] || 'pending').toString() as any) as Lead['status'],
-        notes: (row[notesColIndex] || '').toString().trim(),
-        attempts: parseInt((row[attemptsColIndex] || '0').toString(), 10),
-        lastAttempt: (row[lastAttemptColIndex] || '').toString().trim(),
-        rowIndex: dataIndex + 2, // Google Sheets row number (1-indexed, +1 for header)
+        phones: phones,
+        currentPhoneIndex: 0,
+        phoneAttempts,
+        email,
+        status: (status as any) as Lead['status'],
+        notes,
+        attempts,
+        lastAttempt: lastAttempt || undefined,
       };
     })
     .filter((lead) => lead.phone.trim().length > 0 && lead.name.trim().length > 0);
@@ -161,7 +212,7 @@ export const readLeadsFromSheet = async (
     });
     console.log('[v0] ===== VERIFY: Check if Status/Notes/Attempts will write to P/Q/R columns in your sheet =====');
   }
-  
+
   return leads;
 };
 
@@ -267,7 +318,12 @@ export const updateLeadStatus = async (
 
   if (updateData.length === 0) return;
 
-  console.log('[v0] Updating with data:', updateData);
+  console.log('[v0] ===== NOTES DEBUG =====');
+  console.log('[v0] Notes value being sent:', updates.notes);
+  console.log('[v0] Notes length:', updates.notes?.length || 0);
+  console.log('[v0] Notes column (Q):', indexToLetter(notesColIndex));
+  console.log('[v0] Update data:', JSON.stringify(updateData, null, 2));
+  console.log('[v0] ===========================');
 
   await sheets.spreadsheets.values.batchUpdate({
     auth,

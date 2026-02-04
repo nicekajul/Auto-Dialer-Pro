@@ -4,7 +4,7 @@ import React from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Phone, CheckCircle2, X, MessageSquare } from 'lucide-react';
+import { Clock, Phone, CheckCircle2, X, MessageSquare, PhoneOff, PhoneMissed, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface CallRecord {
   leadId: string;
@@ -25,7 +25,10 @@ const outcomeIcons: Record<string, React.ReactNode> = {
   answered: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
   'no-answer': <X className="w-4 h-4 text-red-400" />,
   voicemail: <MessageSquare className="w-4 h-4 text-amber-400" />,
-  busy: <Phone className="w-4 h-4 text-orange-400" />,
+  busy: <PhoneOff className="w-4 h-4 text-orange-400" />,
+  disconnected: <PhoneMissed className="w-4 h-4 text-red-500" />,
+  'not-in-service': <AlertTriangle className="w-4 h-4 text-purple-400" />,
+  verified: <CheckCircle className="w-4 h-4 text-green-400" />,
 };
 
 const outcomeColors: Record<string, string> = {
@@ -33,6 +36,9 @@ const outcomeColors: Record<string, string> = {
   'no-answer': 'bg-red-900/30 text-red-200',
   voicemail: 'bg-amber-900/30 text-amber-200',
   busy: 'bg-orange-900/30 text-orange-200',
+  disconnected: 'bg-red-950/40 text-red-300',
+  'not-in-service': 'bg-purple-900/30 text-purple-200',
+  verified: 'bg-green-900/30 text-green-200',
 };
 
 export function CallHistory({ leads }: CallHistoryProps) {
@@ -63,16 +69,16 @@ export function CallHistory({ leads }: CallHistoryProps) {
   }
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
-      <CardHeader>
-        <CardTitle className="text-lg">Recent Call History</CardTitle>
+    <Card className="glass-strong shadow-glow border-border/50">
+      <CardHeader className="border-b border-border/50 bg-gradient-to-br from-primary/5 to-transparent">
+        <CardTitle className="text-xl font-bold text-foreground">Recent Call History</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3 max-h-96 overflow-y-auto">
+      <CardContent className="pt-6">
+        <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
           {recentCalls.map((call, index) => (
             <div
               key={index}
-              className="p-3 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors"
+              className="p-4 glass rounded-lg hover:bg-primary/5 hover:border-primary/30 transition-all duration-200 border border-transparent"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">

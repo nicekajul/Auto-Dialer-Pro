@@ -33,7 +33,7 @@ export function AutoDialerUI({
   onNextPhone,
 }: AutoDialerUIProps) {
   const [callDuration, setCallDuration] = useState(0);
-  
+
   // Get current phone and check if there are more phones
   const currentPhoneIndex = currentLead?.currentPhoneIndex || 0;
   const allPhones = currentLead?.phones || [currentLead?.phone].filter(Boolean);
@@ -60,10 +60,11 @@ export function AutoDialerUI({
   };
 
   return (
-    <Card className="glass-strong shadow-glow border-border/50 overflow-hidden">
-      <CardHeader className="border-b border-border bg-gradient-to-br from-primary/10 to-transparent">
+    <Card className="glass-strong shadow-glow border-border/50 overflow-hidden transition-all duration-300">
+      <CardHeader className="border-b border-border bg-gradient-to-br from-primary/10 to-transparent pb-5">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl font-bold text-foreground">
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Phone className="w-6 h-6 text-primary" />
             Active Dialer
           </CardTitle>
           {isAutoDialing && (
@@ -91,9 +92,9 @@ export function AutoDialerUI({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-3 p-4 bg-muted/50 border border-border rounded-lg hover:border-primary transition-all">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-primary" />
+              <div className="flex items-center gap-4 p-4 bg-muted/50 border border-border rounded-xl hover:border-primary/40 transition-all duration-200 cursor-pointer group">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Phone className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">
@@ -131,7 +132,7 @@ export function AutoDialerUI({
                     onClick={onNextPhone}
                     size="lg"
                     variant="outline"
-                    className="w-full border-2 border-primary text-primary h-12 font-semibold hover:bg-primary/5 bg-transparent"
+                    className="w-full border-2 border-primary text-primary h-12 font-semibold hover:bg-primary/70 bg-transparent"
                   >
                     Try Next Phone ({allPhones.length - currentPhoneIndex - 1} more)
                   </Button>
@@ -150,11 +151,11 @@ export function AutoDialerUI({
             </div>
 
             {/* Call Status */}
-            <div className="p-4 bg-muted/50 border border-border rounded-lg text-center">
-              <p className="text-sm text-muted-foreground font-medium">
+            <div className="p-4 bg-gradient-to-br from-muted/50 to-muted/30 border border-border rounded-xl text-center">
+              <p className="text-sm text-muted-foreground font-medium leading-relaxed">
                 {isAutoDialing
-                  ? 'Call in progress... Click "End Call" when done'
-                  : 'Ready to dial. Click button above to begin'}
+                  ? '📞 Call in progress... Click "End Call" when finished'
+                  : '🎯 Ready to dial. Click button above to begin calling'}
               </p>
             </div>
           </div>
