@@ -100,11 +100,33 @@ export default function DashboardPage() {
   };
 
   const handleStopDialing = () => {
+    console.log('[v0] Stopping current call and loading next lead');
+    
+    // Find the next pending lead
+    const nextPendingLead = state.leads.find(
+      (l) => l.id !== state.currentLead?.id && l.status === 'pending'
+    );
+    
+    console.log('[v0] Next pending lead:', nextPendingLead?.name || 'None');
+    
+    // Auto-advance to next lead if available
     setState((prev) => ({
       ...prev,
-      isAutoDialing: false,
-      currentLead: null,
+      currentLead: nextPendingLead || null,
+      isAutoDialing: nextPendingLead ? true : false,
     }));
+    
+    if (nextPendingLead) {
+      toast({
+        title: 'Next Lead Loaded',
+        description: `Now calling ${nextPendingLead.name}`,
+      });
+    } else {
+      toast({
+        title: 'Queue Complete',
+        description: 'No more pending leads in queue',
+      });
+    }
   };
 
   const handleNextPhone = () => {
