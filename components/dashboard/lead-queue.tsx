@@ -258,11 +258,16 @@ export function LeadQueue({ leads, onCallLead, onViewLead }: LeadQueueProps) {
                       className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 flex-wrap">
                         <Badge className="bg-primary/20 text-primary border-0 px-2 py-0.5 font-bold text-xs">
                           {lead.attempts}
                         </Badge>
                         <h4 className="font-semibold text-foreground truncate">{lead.name}</h4>
+                        {lead.bookTitle && (
+                          <span className="text-sm font-medium text-blue-500 dark:text-blue-400 flex items-center gap-1">
+                            <span className="opacity-70">📖</span> {lead.bookTitle}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground font-mono mt-1">{lead.phone}</p>
                     </div>
@@ -338,8 +343,15 @@ export function LeadQueue({ leads, onCallLead, onViewLead }: LeadQueueProps) {
                   className="p-4 glass rounded-lg flex items-center justify-between gap-4 hover:bg-accent/5 transition-all"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5 mb-1.5">
-                      <h4 className="font-semibold text-foreground truncate">{lead.name}</h4>
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-bold text-foreground text-lg">{lead.name}</h3>
+                        {lead.bookTitle && (
+                          <p className="text-sm font-medium text-blue-400 mt-0.5 flex items-center gap-1.5">
+                            <span className="opacity-70">📖</span> {lead.bookTitle}
+                          </p>
+                        )}
+                      </div>
                       <Badge className="bg-primary/20 text-primary border-0 text-xs font-medium">
                         {lead.attempts} attempts
                       </Badge>

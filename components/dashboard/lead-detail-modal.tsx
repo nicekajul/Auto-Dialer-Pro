@@ -53,6 +53,12 @@ export function LeadDetailModal({ lead, isOpen, onClose, onCall }: LeadDetailMod
                         </div>
                         {lead.name}
                     </DialogTitle>
+                    {lead.bookTitle && (
+                        <div className="flex items-center gap-1.5 mt-1 ml-15 text-blue-400 font-medium">
+                            <span className="opacity-70">📖</span>
+                            <span>{lead.bookTitle}</span>
+                        </div>
+                    )}
                 </DialogHeader>
 
                 <div className="space-y-6 pt-4">

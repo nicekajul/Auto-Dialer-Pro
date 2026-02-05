@@ -80,6 +80,11 @@ export function AutoDialerUI({
                   <Mail className="w-3.5 h-3.5" />
                   {currentLead.email}
                 </p>
+                {currentLead.bookTitle && (
+                  <p className="text-sm font-medium text-blue-400 mt-1 flex items-center gap-1.5 bg-blue-500/10 px-2 py-0.5 rounded-md w-fit">
+                    <span className="opacity-70">📖</span> {currentLead.bookTitle}
+                  </p>
+                )}
               </div>
             </div>
 

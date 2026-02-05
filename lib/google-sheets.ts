@@ -20,6 +20,7 @@ export interface Lead {
   attempts: number;
   lastAttempt?: string;
   rowIndex: number;
+  bookTitle?: string;
 }
 
 const sheets = google.sheets('v4');
@@ -123,10 +124,11 @@ export const readLeadsFromSheet = async (
   const notesColIndex = findColumnIndex(['notes', 'note']) ?? 16;
   const attemptsColIndex = findColumnIndex(['attempts', 'attempt']) ?? 17;
   const lastAttemptColIndex = findColumnIndex(['last attempt', 'last called']) ?? 18;
+  const bookTitleColIndex = findColumnIndex(['book title', 'book', 'title']);
   const nameColIndex = findColumnIndex(['name']) ?? 5; // Declare nameColIndex here
 
   console.log('[v0] ===== COLUMN ALIGNMENT VERIFICATION =====');
-  console.log('[v0] Expected columns: G=First Name, H=Last Name, E=Email, J-N=Phones, P=Status, Q=Notes, R=Attempts, S=Last Attempt');
+  console.log('[v0] Expected columns: G=First Name, H=Last Name, E=Email, J-N=Phones, P=Status, Q=Notes, R=Attempts, S=Last Attempt, T=Book Title');
   console.log('[v0] Detected indices:', {
     'First Name (should be 6)': firstNameColIndex,
     'Last Name (should be 7)': lastNameColIndex,
@@ -136,6 +138,7 @@ export const readLeadsFromSheet = async (
     'Notes (should be 16)': notesColIndex,
     'Attempts (should be 17)': attemptsColIndex,
     'Last Attempt (should be 18)': lastAttemptColIndex,
+    'Book Title': bookTitleColIndex,
   });
   console.log('[v0] Column letters:', {
     Status: String.fromCharCode(65 + statusColIndex),
@@ -182,6 +185,7 @@ export const readLeadsFromSheet = async (
       const notes = (row[notesColIndex] || '').toString().trim();
       const attempts = parseInt((row[attemptsColIndex] || '0').toString(), 10);
       const lastAttempt = (row[lastAttemptColIndex] || '').toString().trim();
+      const bookTitle = bookTitleColIndex !== null ? (row[bookTitleColIndex] || '').toString().trim() : undefined;
 
       // Parse phone attempts from notes
       const phoneAttempts = parsePhoneAttempts(notes);
@@ -199,6 +203,7 @@ export const readLeadsFromSheet = async (
         notes,
         attempts,
         lastAttempt: lastAttempt || undefined,
+        bookTitle,
       };
     })
     .filter((lead) => lead.phone.trim().length > 0 && lead.name.trim().length > 0);
