@@ -24,6 +24,16 @@ export interface Lead {
 
 const sheets = google.sheets('v4');
 
+export const getAuthClient = (accessToken: string) => {
+  const auth = new google.auth.OAuth2(
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
+  );
+  auth.setCredentials({ access_token: accessToken });
+  return auth;
+};
+
 // Helper function to parse phone attempts from notes
 function parsePhoneAttempts(notes: string): PhoneAttempt[] {
   if (!notes) return [];
@@ -62,13 +72,7 @@ export const readLeadsFromSheet = async (
   spreadsheetId: string,
   sheetName: string = 'Lead mine 2026'
 ): Promise<Lead[]> => {
-  const auth = new google.auth.OAuth2(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-  );
-
-  auth.setCredentials({ access_token: accessToken });
+  const auth = getAuthClient(accessToken);
 
   // Read ALL rows including header (A1:S1000)
   const response = await sheets.spreadsheets.values.get({
@@ -368,13 +372,7 @@ export const updateLeadStatus = async (
   },
   sheetName: string = 'Lead mine 2026'
 ) => {
-  const auth = new google.auth.OAuth2(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-  );
-
-  auth.setCredentials({ access_token: accessToken });
+  const auth = getAuthClient(accessToken);
 
   // CHECK FOR AUTO-ARCHIVE
   if (updates.status === 'disconnected' || updates.status === 'not-in-service') {
@@ -487,13 +485,7 @@ export const getSpreadsheetMetadata = async (
   accessToken: string,
   spreadsheetId: string
 ) => {
-  const auth = new google.auth.OAuth2(
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-  );
-
-  auth.setCredentials({ access_token: accessToken });
+  const auth = getAuthClient(accessToken);
 
   const response = await sheets.spreadsheets.get({
     auth,

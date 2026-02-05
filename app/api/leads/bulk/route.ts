@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { getAuthClient } from '@/lib/google-sheets';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,13 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const auth = new google.auth.OAuth2(
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-    );
-
-    auth.setCredentials({ access_token: accessToken });
+    const auth = getAuthClient(accessToken);
 
     // Create sheets API instance inside the function
     const sheets = google.sheets('v4');
@@ -84,7 +79,7 @@ export async function POST(request: NextRequest) {
     });
 
     const rows = response.data.values || [];
-    const updates = [];
+    const updates: any[] = [];
 
     // Process based on action
     // Column mappings: P=Status(16), Q=Notes(17), R=Attempts(18), S=LastAttempt(19)

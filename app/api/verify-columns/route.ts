@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { getAuthClient } from '@/lib/google-sheets';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,13 +15,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const auth = new google.auth.OAuth2(
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI
-    );
-
-    auth.setCredentials({ access_token: accessToken });
+    const auth = getAuthClient(accessToken);
 
     const sheets = google.sheets('v4');
 

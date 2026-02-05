@@ -464,6 +464,25 @@ git push --force-with-lease
 
 ---
 
+## 🚀 Production Best Practices
+
+### 1. Verification
+We have enabled strict type checking and build validation. Before deploying, always run:
+```bash
+npm run build
+```
+Ensure this passes locally.
+
+### 2. Environment Variables
+Ensure `NODE_ENV` is set to `production` (automatic on Vercel/Cloudflare).
+Verify all Google OAuth variables are present.
+
+### 3. Performance
+- **Strict Mode**: The app is configured for production stability.
+- **Analytics**: Vercel Analytics is enabled for traffic tracking.
+
+---
+
 ## 📞 Support
 
 ### Pre-Deployment
