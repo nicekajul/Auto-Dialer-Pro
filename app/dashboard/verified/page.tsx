@@ -9,25 +9,7 @@ import { Input } from '@/components/ui/input';
 import { LeadDetailModal } from '@/components/dashboard/lead-detail-modal';
 import { Search, CheckCircle, Calendar, Phone, User, Download } from 'lucide-react';
 
-interface PhoneAttempt {
-    phone: string;
-    outcome: string | null;
-    timestamp?: string;
-}
-
-interface Lead {
-    id: string;
-    name: string;
-    phone: string;
-    phones?: string[];
-    phoneAttempts?: PhoneAttempt[];
-    email: string;
-    status: string;
-    notes: string;
-    attempts: number;
-    lastAttempt?: string;
-    rowIndex?: number;
-}
+import { Lead } from '@/lib/google-sheets';
 
 export default function VerifiedLeadsPage() {
     const [leads, setLeads] = useState<Lead[]>([]);

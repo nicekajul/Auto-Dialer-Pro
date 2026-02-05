@@ -9,15 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Phone, Search, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface Lead {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  status: string;
-  attempts: number;
-  rowIndex?: number;
-}
+import { Lead } from '@/lib/google-sheets';
 
 interface LeadQueueProps {
   leads: Lead[];

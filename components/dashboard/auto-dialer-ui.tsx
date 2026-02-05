@@ -7,15 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Phone, PhoneOff, Clock, User, Mail, ExternalLink } from 'lucide-react';
 import { openClickToDial, formatPhoneNumber } from '@/lib/ringcentral-dial';
 
-interface Lead {
-  id: string;
-  name: string;
-  phone: string;
-  phones?: string[];
-  currentPhoneIndex?: number;
-  email: string;
-  status: string;
-}
+import { Lead } from '@/lib/google-sheets';
 
 interface AutoDialerUIProps {
   currentLead: Lead | null;

@@ -5,25 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Phone, Mail, User, Calendar, MessageSquare, X } from 'lucide-react';
 
-interface PhoneAttempt {
-    phone: string;
-    outcome: string | null;
-    timestamp?: string;
-}
-
-interface Lead {
-    id: string;
-    name: string;
-    phone: string;
-    phones?: string[];
-    phoneAttempts?: PhoneAttempt[];
-    email: string;
-    status: string;
-    notes: string;
-    attempts: number;
-    lastAttempt?: string;
-    rowIndex?: number;
-}
+import { Lead } from '@/lib/google-sheets';
 
 interface LeadDetailModalProps {
     lead: Lead | null;

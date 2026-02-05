@@ -6,18 +6,7 @@ import { LeadQueue } from '@/components/dashboard/lead-queue';
 import { LeadDetailModal } from '@/components/dashboard/lead-detail-modal';
 import { useRouter } from 'next/navigation';
 
-interface Lead {
-    id: string;
-    name: string;
-    phone: string;
-    phones?: string[];
-    email: string;
-    status: string;
-    notes: string;
-    attempts: number;
-    lastAttempt?: string;
-    rowIndex?: number;
-}
+import { Lead } from '@/lib/google-sheets';
 
 export default function QueuePage() {
     const router = useRouter();

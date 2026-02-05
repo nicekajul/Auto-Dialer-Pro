@@ -4,12 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { TrendingUp, Phone, CheckCircle, XCircle, Clock } from 'lucide-react';
 
-interface Lead {
-    id: string;
-    status: string;
-    attempts: number;
-    name: string;
-}
+import { Lead } from '@/lib/google-sheets';
 
 interface CompactAnalyticsProps {
     leads: Lead[];

@@ -3,12 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-interface Lead {
-  id: string;
-  status: string;
-  attempts: number;
-  name: string;
-}
+import { Lead } from '@/lib/google-sheets';
 
 interface AnalyticsDashboardProps {
   leads: Lead[];
